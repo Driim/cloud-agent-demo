@@ -1,5 +1,7 @@
 """Pydantic schemas for analytics module."""
 
+from datetime import date
+
 from pydantic import BaseModel
 
 
@@ -25,7 +27,7 @@ class OverviewResponse(BaseModel):
 class TimeSeriesPoint(BaseModel):
     """Single data point in a time series."""
 
-    timestamp: str  # ISO-8601 date string
+    timestamp: date
     value: float
 
 

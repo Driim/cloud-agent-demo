@@ -60,7 +60,12 @@ TIMESERIES: Final[dict[str, list[dict]]] = {
 
 QUOTAS: Final[list[dict]] = [
     {"name": "Sessions", "used": 1_247, "limit": 5_000, "unit": "sessions/month"},
-    {"name": "Tokens", "used": 48_312_500, "limit": 100_000_000, "unit": "tokens/month"},
+    {
+        "name": "Tokens",
+        "used": 48_312_500,
+        "limit": 100_000_000,
+        "unit": "tokens/month",
+    },
     {"name": "Concurrent agents", "used": 4, "limit": 10, "unit": "agents"},
     {"name": "Storage", "used": 18.4, "limit": 100.0, "unit": "GB"},
 ]

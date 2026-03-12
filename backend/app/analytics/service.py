@@ -45,23 +45,14 @@ def get_timeseries(
     """Return time-series points filtered by range and granularity.
 
     Args:
-        metric: One of tokens | sessions | spend | prs.
-        range_: One of 7d | 30d | 90d.
-        granularity: One of hour | day (hour returns same daily data for now).
+        metric: One of tokens | sessions | spend | prs (validated by router).
+        range_: One of 7d | 30d | 90d (validated by router).
+        granularity: One of hour | day (validated by router).
 
     Returns:
         TimeSeriesResponse with the filtered points.
-
-    Raises:
-        ValueError: If metric or range_ are invalid.
     """
-    if metric not in _VALID_METRICS:
-        raise ValueError(f"Unknown metric '{metric}'. Valid: {sorted(_VALID_METRICS)}")
-
-    days = _RANGE_DAYS.get(range_)
-    if days is None:
-        raise ValueError(f"Unknown range '{range_}'. Valid: {sorted(_RANGE_DAYS)}")
-
+    days = _RANGE_DAYS[range_]
     all_points = mock_data.TIMESERIES[metric]
     filtered = all_points[-days:]
 
