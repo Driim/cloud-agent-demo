@@ -25,7 +25,11 @@ def get_current_user(
     In production this will decode and verify the JWT. In mock mode
     any Bearer token is accepted, but the header must be present.
     """
-    bearer = authorization.removeprefix("Bearer ") if authorization and authorization.startswith("Bearer ") else None
+    bearer = (
+        authorization.removeprefix("Bearer ")
+        if authorization and authorization.startswith("Bearer ")
+        else None
+    )
     return _validate_token(bearer)
 
 
@@ -38,7 +42,11 @@ def get_current_user_sse(
     EventSource API does not support custom headers in browsers, so token
     is passed as a query parameter as a fallback.
     """
-    bearer = authorization.removeprefix("Bearer ") if authorization and authorization.startswith("Bearer ") else None
+    bearer = (
+        authorization.removeprefix("Bearer ")
+        if authorization and authorization.startswith("Bearer ")
+        else None
+    )
     return _validate_token(bearer or token)
 
 
