@@ -10,6 +10,23 @@
 
   --color-ai-blue: #3B82F6;
   --color-ai-purple: #8B5CF6;
+
+  /* Tremor dark theme tokens (required by Tremor v3 tooltip/chart internals) */
+  --color-tremor-background: #1a1a1a;
+  --color-tremor-border: rgba(255, 255, 255, 0.1);
+  --color-tremor-content: #a3a3a3;
+  --color-tremor-content-emphasis: #ffffff;
+  --color-tremor-content-subtle: #525252;
+  --color-dark-tremor-background: #1a1a1a;
+  --color-dark-tremor-border: rgba(255, 255, 255, 0.1);
+  --color-dark-tremor-content: #a3a3a3;
+  --color-dark-tremor-content-emphasis: #ffffff;
+  --color-dark-tremor-content-subtle: #525252;
+
+  --shadow-tremor-dropdown: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-dark-tremor-dropdown: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-tremor-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-dark-tremor-card: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 @layer base {
@@ -128,6 +145,53 @@
 }
 
 /* Donut chart center label */
-.recharts-text.recharts-label {
+.recharts-text.recharts-label,
+.recharts-label-list .recharts-label,
+svg text.recharts-text[text-anchor="middle"] {
   fill: #ffffff !important;
 }
+
+/* --- Tremor Badge / BadgeDelta dark-mode text contrast --- */
+/* Force white bold text for readability on dark backgrounds. */
+.dark [class*="tremor-Badge"],
+.dark [class*="tremor-BadgeDelta"] {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* Darker badge backgrounds in dark mode for consistent look */
+.dark [class*="tremor-Badge"][class*="bg-emerald"],
+.dark [class*="tremor-Badge"][class*="bg-green"],
+.dark [class*="tremor-BadgeDelta"][class*="bg-emerald"],
+.dark [class*="tremor-BadgeDelta"][class*="bg-green"] {
+  background-color: rgba(5, 150, 105, 0.4) !important; /* emerald-600 at 40% */
+}
+
+.dark [class*="tremor-Badge"][class*="bg-blue"],
+.dark [class*="tremor-BadgeDelta"][class*="bg-blue"] {
+  background-color: rgba(37, 99, 235, 0.4) !important; /* blue-600 at 40% */
+}
+
+.dark [class*="tremor-Badge"][class*="bg-red"],
+.dark [class*="tremor-BadgeDelta"][class*="bg-red"] {
+  background-color: rgba(220, 38, 38, 0.4) !important; /* red-600 at 40% */
+}
+
+.dark [class*="tremor-Badge"][class*="bg-amber"],
+.dark [class*="tremor-BadgeDelta"][class*="bg-amber"] {
+  background-color: rgba(217, 119, 6, 0.4) !important; /* amber-600 at 40% */
+}
+
+/* --- Darker chart fills/strokes for dark theme --- */
+/* Shift Tremor chart colors from -500 to -700 for a muted dark-friendly palette */
+.dark [class*="fill-blue-500"]    { fill: #1d4ed8 !important; }     /* blue-700 */
+.dark [class*="fill-violet-500"]  { fill: #6d28d9 !important; }     /* violet-700 */
+.dark [class*="fill-emerald-500"] { fill: #047857 !important; }     /* emerald-700 */
+.dark [class*="fill-red-500"]     { fill: #b91c1c !important; }     /* red-700 */
+.dark [class*="fill-amber-500"]   { fill: #b45309 !important; }     /* amber-700 */
+
+.dark [class*="stroke-blue-500"]    { stroke: #1d4ed8 !important; } /* blue-700 */
+.dark [class*="stroke-violet-500"]  { stroke: #6d28d9 !important; } /* violet-700 */
+.dark [class*="stroke-emerald-500"] { stroke: #047857 !important; } /* emerald-700 */
+.dark [class*="stroke-red-500"]     { stroke: #b91c1c !important; } /* red-700 */
+.dark [class*="stroke-amber-500"]   { stroke: #b45309 !important; } /* amber-700 */
