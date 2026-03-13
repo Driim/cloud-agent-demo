@@ -14,7 +14,7 @@ class TestSessionsService:
         result = service.list_sessions()
         assert len(result.data) == 20
         assert result.pagination.has_more is True
-        assert result.pagination.approx_total == 50
+        assert result.pagination.approx_total == len(SESSIONS)
         assert result.pagination.limit == 20
 
     def test_list_sessions_custom_limit(self) -> None:

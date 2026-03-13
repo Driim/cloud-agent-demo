@@ -49,14 +49,59 @@ TEAM_MEMBERS: Final[list[dict]] = [
         "avg_session_duration_sec": 610,
         "total_cost_usd": 473.13,
     },
+    {
+        "user": "elena@acme-corp.io",
+        "display_name": "Elena Petrova",
+        "sessions": 189,
+        "tokens_used": 7_340_000,
+        "prs_merged": 134,
+        "success_rate": 93.1,
+        "avg_session_duration_sec": 395,
+        "total_cost_usd": 367.00,
+    },
+    {
+        "user": "frank@acme-corp.io",
+        "display_name": "Frank O'Brien",
+        "sessions": 276,
+        "tokens_used": 10_850_000,
+        "prs_merged": 198,
+        "success_rate": 86.2,
+        "avg_session_duration_sec": 555,
+        "total_cost_usd": 542.50,
+    },
+    {
+        "user": "grace@acme-corp.io",
+        "display_name": "Grace Yamamoto",
+        "sessions": 312,
+        "tokens_used": 12_060_000,
+        "prs_merged": 231,
+        "success_rate": 90.4,
+        "avg_session_duration_sec": 460,
+        "total_cost_usd": 603.00,
+    },
+    {
+        "user": "hector@acme-corp.io",
+        "display_name": "Hector Ruiz",
+        "sessions": 164,
+        "tokens_used": 6_180_000,
+        "prs_merged": 112,
+        "success_rate": 79.8,
+        "avg_session_duration_sec": 680,
+        "total_cost_usd": 309.00,
+    },
 ]
 
-_REPOS: Final[list[str]] = [
+REPOS: Final[list[str]] = [
     "acme-corp/backend-api",
     "acme-corp/frontend-app",
     "acme-corp/data-pipeline",
     "acme-corp/infra-terraform",
     "acme-corp/mobile-sdk",
+    "acme-corp/auth-service",
+    "acme-corp/ml-models",
+    "acme-corp/docs-site",
+    "acme-corp/billing-engine",
+    "acme-corp/notification-hub",
 ]
 
 _EVENT_TYPES: Final[list[str]] = [
@@ -79,7 +124,7 @@ def _generate_events() -> list[dict]:
     for i in range(30):
         event_type = _EVENT_TYPES[i % len(_EVENT_TYPES)]
         user = _USERS[i % len(_USERS)]
-        repo = _REPOS[i % len(_REPOS)]
+        repo = REPOS[i % len(REPOS)]
         ts = _BASE_DT - timedelta(minutes=i * 12)
 
         descriptions = {

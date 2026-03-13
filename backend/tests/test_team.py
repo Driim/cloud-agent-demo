@@ -35,10 +35,11 @@ class TestTeamService:
             if len(events) >= 2:
                 break
         assert len(events) == 2
-        assert "event" in events[0]
         assert "data" in events[0]
         parsed = json.loads(events[0]["data"])
         assert "event_id" in parsed
+        assert "event_type" in parsed
+        assert "timestamp" in parsed
 
     @pytest.mark.asyncio
     async def test_stream_activity_feed_json_serializable(self) -> None:
