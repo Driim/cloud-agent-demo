@@ -20,6 +20,7 @@ function SessionsPerMember({ data }: SessionsPerMemberProps) {
         index="name"
         categories={['Sessions']}
         colors={['indigo']}
+        yAxisWidth={40}
         showAnimation
       />
     </Card>

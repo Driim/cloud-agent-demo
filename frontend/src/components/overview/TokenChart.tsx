@@ -1,15 +1,16 @@
 import { Card, Title, AreaChart } from '@tremor/react'
-import type { TimeSeriesResponse } from '../../types/api'
+import type { MultiSeriesResponse } from '../../types/api'
 import { formatChartDate } from '../../utils/format'
 
 interface TokenChartProps {
-  readonly data: TimeSeriesResponse
+  readonly data: MultiSeriesResponse
 }
 
 function TokenChart({ data }: TokenChartProps) {
   const chartData = data.points.map((p) => ({
     date: formatChartDate(p.timestamp),
-    Tokens: p.value,
+    'Input Tokens': p.input_tokens,
+    'Output Tokens': p.output_tokens,
   }))
 
   return (
@@ -19,11 +20,13 @@ function TokenChart({ data }: TokenChartProps) {
         className="mt-4 h-72"
         data={chartData}
         index="date"
-        categories={['Tokens']}
-        colors={['indigo']}
+        categories={['Input Tokens', 'Output Tokens']}
+        colors={['indigo', 'cyan']}
+        stack
         valueFormatter={(n: number) =>
           n >= 1_000 ? `${(n / 1_000).toFixed(1)}k` : n.toString()
         }
+        yAxisWidth={56}
         showAnimation
       />
     </Card>

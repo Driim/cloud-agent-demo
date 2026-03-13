@@ -2,26 +2,26 @@ import { Card, LineChart, Title } from '@tremor/react'
 import type { TimeSeriesResponse } from '../../types/api'
 import { formatChartDate } from '../../utils/format'
 
-interface SpendTrendProps {
+interface LatencyP95ChartProps {
   readonly data: TimeSeriesResponse
 }
 
-function SpendTrend({ data }: SpendTrendProps) {
+function LatencyP95Chart({ data }: LatencyP95ChartProps) {
   const chartData = data.points.map((p) => ({
     date: formatChartDate(p.timestamp),
-    Spend: p.value,
+    'P95 (ms)': p.value,
   }))
 
   return (
     <Card>
-      <Title>Daily Spend Trend</Title>
+      <Title>P95 Latency Trend</Title>
       <LineChart
         className="mt-4 h-72"
         data={chartData}
         index="date"
-        categories={['Spend']}
-        colors={['indigo']}
-        valueFormatter={(n: number) => `$${n.toFixed(2)}`}
+        categories={['P95 (ms)']}
+        colors={['rose']}
+        valueFormatter={(n: number) => `${Math.round(n)}ms`}
         yAxisWidth={56}
         showAnimation
       />
@@ -29,4 +29,4 @@ function SpendTrend({ data }: SpendTrendProps) {
   )
 }
 
-export default SpendTrend
+export default LatencyP95Chart

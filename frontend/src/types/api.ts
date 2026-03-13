@@ -96,7 +96,7 @@ export interface TimeSeriesPoint {
   readonly value: number
 }
 
-export type TimeSeriesMetric = 'tokens' | 'sessions' | 'spend' | 'prs'
+export type TimeSeriesMetric = 'tokens' | 'sessions' | 'spend' | 'prs' | 'latency_p95' | 'cost_per_session'
 export type TimeSeriesRange = '7d' | '30d' | '90d'
 export type TimeSeriesGranularity = 'hour' | 'day'
 
@@ -140,6 +140,59 @@ export interface ErrorDistributionItem {
 export interface ErrorDistributionResponse {
   readonly total_errors: number
   readonly items: readonly ErrorDistributionItem[]
+}
+
+// ── Token breakdown (stacked) ──
+
+export interface MultiSeriesPoint {
+  readonly timestamp: string
+  readonly input_tokens: number
+  readonly output_tokens: number
+}
+
+export interface MultiSeriesResponse {
+  readonly metric: string
+  readonly range: string
+  readonly granularity: string
+  readonly points: readonly MultiSeriesPoint[]
+}
+
+// ── Session outcomes ──
+
+export interface SessionOutcomeItem {
+  readonly status: string
+  readonly count: number
+  readonly percentage: number
+}
+
+export interface SessionOutcomesResponse {
+  readonly total: number
+  readonly items: readonly SessionOutcomeItem[]
+}
+
+// ── Tokens per PR ──
+
+export interface TokensPerPRResponse {
+  readonly avg_tokens_per_pr: number
+  readonly delta_pct: number
+}
+
+// ── Duration distribution ──
+
+export interface DurationBucket {
+  readonly bucket: string
+  readonly count: number
+}
+
+// ── Adoption rate ──
+
+export interface AdoptionRateResponse {
+  readonly rate_7d: number
+  readonly rate_30d: number
+  readonly total_members: number
+  readonly active_7d: number
+  readonly active_30d: number
+  readonly delta_7d_pct: number
 }
 
 // ── Team ──

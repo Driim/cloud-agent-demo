@@ -1,5 +1,13 @@
 import '@testing-library/jest-dom'
 
+// Required by Recharts (Tremor chart components) in JSDOM
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+window.ResizeObserver = window.ResizeObserver ?? ResizeObserverStub
+
 // Required by Tremor and other UI libs that check responsive breakpoints
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

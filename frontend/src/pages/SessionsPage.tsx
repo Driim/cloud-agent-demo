@@ -1,10 +1,13 @@
 import { useState } from 'react'
-import { Title } from '@tremor/react'
+import { Grid, Title } from '@tremor/react'
 import { useSessions } from '../api/sessions'
-import { useErrors } from '../api/analytics'
+import { useErrors, useTimeseries, useDurationDistribution, useQuotas } from '../api/analytics'
 import SessionsTable from '../components/sessions/SessionsTable'
 import SessionFilters from '../components/sessions/SessionFilters'
 import ErrorBreakdown from '../components/sessions/ErrorBreakdown'
+import DurationDistribution from '../components/sessions/DurationDistribution'
+import LatencyP95Chart from '../components/sessions/LatencyP95Chart'
+import ConcurrentSessions from '../components/sessions/ConcurrentSessions'
 import LoadingSkeleton from '../components/shared/LoadingSkeleton'
 import ErrorState from '../components/shared/ErrorState'
 import { sanitizeApiError } from '../utils/errors'
@@ -16,6 +19,9 @@ function SessionsPage() {
 
   const sessions = useSessions({ status, cursor, limit: 20 })
   const errors = useErrors()
+  const latencyP95 = useTimeseries('latency_p95')
+  const durationDist = useDurationDistribution()
+  const quotas = useQuotas()
 
   if (sessions.isLoading) {
     return <LoadingSkeleton lines={8} />
@@ -43,6 +49,13 @@ function SessionsPage() {
         <Title>Agent Sessions</Title>
         <SessionFilters status={status} onStatusChange={(s) => { setStatus(s); setCursor(undefined) }} />
       </div>
+
+      {quotas.data && <ConcurrentSessions data={quotas.data} />}
+
+      <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
+        {durationDist.data && <DurationDistribution data={durationDist.data} />}
+        {latencyP95.data && <LatencyP95Chart data={latencyP95.data} />}
+      </Grid>
 
       {errors.data && <ErrorBreakdown data={errors.data} />}
 

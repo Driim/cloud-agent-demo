@@ -7,16 +7,23 @@ needs to change.
 
 from app.analytics import mock_data
 from app.analytics.schemas import (
+    AdoptionRateResponse,
     CostLineItem,
     CostResponse,
     CostTrend,
+    DurationBucket,
     ErrorDistributionItem,
     ErrorDistributionResponse,
+    MultiSeriesPoint,
+    MultiSeriesResponse,
     OverviewResponse,
     QuotaItem,
     RepoActivity,
+    SessionOutcomeItem,
+    SessionOutcomesResponse,
     TimeSeriesPoint,
     TimeSeriesResponse,
+    TokensPerPRResponse,
 )
 
 _RANGE_DAYS: dict[str, int] = {"7d": 7, "30d": 30, "90d": 90}
@@ -86,3 +93,52 @@ def get_errors() -> ErrorDistributionResponse:
         total_errors=data["total_errors"],
         items=[ErrorDistributionItem(**item) for item in data["items"]],
     )
+
+
+def get_token_breakdown(
+    range_: str = "30d",
+    granularity: str = "day",
+) -> MultiSeriesResponse:
+    """Return stacked input/output token time-series."""
+    days = _RANGE_DAYS[range_]
+    input_pts = mock_data.TOKEN_BREAKDOWN["token_input"][-days:]
+    output_pts = mock_data.TOKEN_BREAKDOWN["token_output"][-days:]
+
+    points = [
+        MultiSeriesPoint(
+            timestamp=inp["timestamp"],
+            input_tokens=inp["value"],
+            output_tokens=out["value"],
+        )
+        for inp, out in zip(input_pts, output_pts)
+    ]
+    return MultiSeriesResponse(
+        metric="token_breakdown",
+        range=range_,
+        granularity=granularity,
+        points=points,
+    )
+
+
+def get_session_outcomes() -> SessionOutcomesResponse:
+    """Return session outcome distribution."""
+    data = mock_data.SESSION_OUTCOMES
+    return SessionOutcomesResponse(
+        total=data["total"],
+        items=[SessionOutcomeItem(**item) for item in data["items"]],
+    )
+
+
+def get_tokens_per_pr() -> TokensPerPRResponse:
+    """Return average tokens consumed per merged PR."""
+    return TokensPerPRResponse(**mock_data.TOKENS_PER_PR)
+
+
+def get_duration_distribution() -> list[DurationBucket]:
+    """Return session duration bucket distribution."""
+    return [DurationBucket(**b) for b in mock_data.DURATION_DISTRIBUTION]
+
+
+def get_adoption_rate() -> AdoptionRateResponse:
+    """Return team adoption rate metrics."""
+    return AdoptionRateResponse(**mock_data.ADOPTION_RATE)

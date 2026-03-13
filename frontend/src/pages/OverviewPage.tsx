@@ -1,5 +1,5 @@
 import { Grid, Title } from '@tremor/react'
-import { useOverview, useTimeseries, useErrors } from '../api/analytics'
+import { useOverview, useTokenBreakdown, useSessionOutcomes } from '../api/analytics'
 import OverviewKPIs from '../components/overview/OverviewKPIs'
 import TokenChart from '../components/overview/TokenChart'
 import OutcomesDonut from '../components/overview/OutcomesDonut'
@@ -11,14 +11,14 @@ import { sanitizeApiError } from '../utils/errors'
 
 function OverviewPage() {
   const overview = useOverview()
-  const tokenSeries = useTimeseries('tokens')
-  const errors = useErrors()
+  const tokenBreakdown = useTokenBreakdown()
+  const outcomes = useSessionOutcomes()
 
-  if (overview.isLoading || tokenSeries.isLoading || errors.isLoading) {
+  if (overview.isLoading || tokenBreakdown.isLoading || outcomes.isLoading) {
     return <LoadingSkeleton lines={6} />
   }
 
-  const pageErrors = [overview.error, tokenSeries.error, errors.error].filter(Boolean) as Error[]
+  const pageErrors = [overview.error, tokenBreakdown.error, outcomes.error].filter(Boolean) as Error[]
   if (pageErrors.length > 0) {
     const message =
       pageErrors.length === 1
@@ -29,14 +29,14 @@ function OverviewPage() {
         message={message}
         onRetry={() => {
           void overview.refetch()
-          void tokenSeries.refetch()
-          void errors.refetch()
+          void tokenBreakdown.refetch()
+          void outcomes.refetch()
         }}
       />
     )
   }
 
-  if (!overview.data || !tokenSeries.data || !errors.data) {
+  if (!overview.data || !tokenBreakdown.data || !outcomes.data) {
     return null
   }
 
@@ -45,8 +45,8 @@ function OverviewPage() {
       <Title>Overview</Title>
       <OverviewKPIs data={overview.data} />
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
-        <TokenChart data={tokenSeries.data} />
-        <OutcomesDonut data={errors.data} />
+        <TokenChart data={tokenBreakdown.data} />
+        <OutcomesDonut data={outcomes.data} />
       </Grid>
       <TopReposBar data={overview.data.top_repos} />
       <CostPerPRCard avgCostPerPr={overview.data.avg_cost_per_pr_usd} />

@@ -7,7 +7,7 @@ interface TopReposBarProps {
 
 function TopReposBar({ data }: TopReposBarProps) {
   const chartData = data.map((r) => ({
-    repo: r.repo,
+    repo: r.repo.includes('/') ? r.repo.split('/')[1] : r.repo,
     Sessions: r.sessions,
   }))
 
@@ -21,6 +21,7 @@ function TopReposBar({ data }: TopReposBarProps) {
         categories={['Sessions']}
         colors={['indigo']}
         layout="vertical"
+        yAxisWidth={100}
         showAnimation
       />
     </Card>

@@ -1,19 +1,26 @@
 import { Card, DonutChart, Title } from '@tremor/react'
-import type { ErrorDistributionResponse } from '../../types/api'
+import type { SessionOutcomesResponse } from '../../types/api'
 
 interface OutcomesDonutProps {
-  readonly data: ErrorDistributionResponse
+  readonly data: SessionOutcomesResponse
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  completed: 'Completed',
+  merged: 'Merged',
+  failed: 'Failed',
+  timed_out: 'Timed Out',
 }
 
 function OutcomesDonut({ data }: OutcomesDonutProps) {
   const chartData = data.items.map((item) => ({
-    name: item.error_type,
+    name: STATUS_LABELS[item.status] ?? item.status,
     value: item.count,
   }))
 
   return (
     <Card>
-      <Title>Error Distribution</Title>
+      <Title>Session Outcomes</Title>
       <DonutChart
         className="mt-4 h-72"
         data={chartData}

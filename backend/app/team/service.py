@@ -39,7 +39,7 @@ _COMPLETED_TEMPLATES = [
 
 _PR_TEMPLATES = [
     "{name} merged PR #{pr} on {repo}",
-    "{name} merged \"{branch}\" into main on {repo}",
+    '{name} merged "{branch}" into main on {repo}',
     "{name} landed PR #{pr} on {repo} (+{additions}/-{deletions})",
     "{name} merged PR #{pr} on {repo} — {reviewers} approvals",
 ]
@@ -63,10 +63,22 @@ _FAILURE_REASONS = [
 
 _BRANCH_PREFIXES = ["feat", "fix", "refactor", "chore", "perf", "docs"]
 _BRANCH_NAMES = [
-    "add-auth", "memory-leak", "dashboard-v2", "deps-update",
-    "api-pagination", "timeout-handling", "sse-events", "db-layer",
-    "dark-mode", "race-condition", "user-roles", "cache-invalidation",
-    "error-boundaries", "rate-limiter", "webhook-retry", "schema-migration",
+    "add-auth",
+    "memory-leak",
+    "dashboard-v2",
+    "deps-update",
+    "api-pagination",
+    "timeout-handling",
+    "sse-events",
+    "db-layer",
+    "dark-mode",
+    "race-condition",
+    "user-roles",
+    "cache-invalidation",
+    "error-boundaries",
+    "rate-limiter",
+    "webhook-retry",
+    "schema-migration",
 ]
 
 

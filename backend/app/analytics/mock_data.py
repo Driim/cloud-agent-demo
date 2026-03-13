@@ -79,6 +79,12 @@ TIMESERIES: Final[dict[str, list[dict]]] = {
     "prs": _make_series(
         base=17.4, amplitude=4.5, period=14, trend=0.06, weekend_dip=0.45
     ),
+    "latency_p95": _make_series(
+        base=380, amplitude=60, period=7, trend=0.5, weekend_dip=0.15
+    ),
+    "cost_per_session": _make_series(
+        base=1.93, amplitude=0.3, period=14, trend=-0.005, weekend_dip=0.0
+    ),
 }
 
 # ---------------------------------------------------------------------------
@@ -151,4 +157,64 @@ ERRORS: Final[dict] = {
         {"error_type": "dependency_conflict", "count": 9, "percentage": 3.3},
         {"error_type": "permission_denied", "count": 7, "percentage": 2.5},
     ],
+}
+
+# ---------------------------------------------------------------------------
+# Token breakdown (input / output split for stacked chart)
+# ---------------------------------------------------------------------------
+
+TOKEN_BREAKDOWN: Final[dict[str, list[dict]]] = {
+    "token_input": _make_series(
+        base=322_750, amplitude=48_000, period=14, trend=720, weekend_dip=0.35
+    ),
+    "token_output": _make_series(
+        base=215_166, amplitude=32_000, period=14, trend=480, weekend_dip=0.35
+    ),
+}
+
+# ---------------------------------------------------------------------------
+# Session outcomes (completed / merged / failed / timed_out)
+# ---------------------------------------------------------------------------
+
+SESSION_OUTCOMES: Final[dict] = {
+    "total": 80,
+    "items": [
+        {"status": "completed", "count": 27, "percentage": 33.75},
+        {"status": "merged", "count": 33, "percentage": 41.25},
+        {"status": "failed", "count": 13, "percentage": 16.25},
+        {"status": "timed_out", "count": 7, "percentage": 8.75},
+    ],
+}
+
+# ---------------------------------------------------------------------------
+# Tokens per merged PR
+# ---------------------------------------------------------------------------
+
+TOKENS_PER_PR: Final[dict] = {
+    "avg_tokens_per_pr": 53_810,
+    "delta_pct": -4.2,
+}
+
+# ---------------------------------------------------------------------------
+# Duration distribution (session length buckets)
+# ---------------------------------------------------------------------------
+
+DURATION_DISTRIBUTION: Final[list[dict]] = [
+    {"bucket": "< 1 min", "count": 5},
+    {"bucket": "1\u20135 min", "count": 28},
+    {"bucket": "5\u201315 min", "count": 31},
+    {"bucket": "15+ min", "count": 16},
+]
+
+# ---------------------------------------------------------------------------
+# Adoption rate
+# ---------------------------------------------------------------------------
+
+ADOPTION_RATE: Final[dict] = {
+    "rate_7d": 75.0,
+    "rate_30d": 100.0,
+    "total_members": 8,
+    "active_7d": 6,
+    "active_30d": 8,
+    "delta_7d_pct": 12.5,
 }

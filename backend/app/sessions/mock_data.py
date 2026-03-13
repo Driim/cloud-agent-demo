@@ -182,9 +182,7 @@ def _generate_sessions() -> list[dict]:
         tokens_used = 5_000 + (i * 1_571 + 237) % 85_000
         cost_usd = round(tokens_used * 0.00005, 2)
         pr_number = (100 + i) if status in ("merged", "completed") else None
-        pr_url = (
-            f"https://github.com/{repo}/pull/{pr_number}" if pr_number else None
-        )
+        pr_url = f"https://github.com/{repo}/pull/{pr_number}" if pr_number else None
 
         sessions.append(
             {

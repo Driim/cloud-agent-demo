@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Grid, Title } from '@tremor/react'
-import { useCosts, useTimeseries, useQuotas } from '../api/analytics'
+import { useCosts, useTimeseries, useQuotas, useTokensPerPR } from '../api/analytics'
 import SpendTrend from '../components/costs/SpendTrend'
 import CostBreakdownDonut from '../components/costs/CostBreakdownDonut'
 import CostTrendChart from '../components/costs/CostTrendChart'
+import TokensPerPRCard from '../components/costs/TokensPerPRCard'
 import QuotasList from '../components/costs/QuotasList'
 import BudgetAlerts from '../components/costs/BudgetAlerts'
 import KPICard from '../components/shared/KPICard'
@@ -16,8 +17,10 @@ import type { TimeSeriesRange } from '../types/api'
 function CostsPage() {
   const [range, setRange] = useState<TimeSeriesRange>('30d')
   const spendSeries = useTimeseries('spend', range)
+  const costPerSession = useTimeseries('cost_per_session', range)
   const costs = useCosts()
   const quotas = useQuotas()
+  const tokensPerPR = useTokensPerPR()
 
   if (spendSeries.isLoading || costs.isLoading || quotas.isLoading) {
     return <LoadingSkeleton lines={6} />
@@ -36,6 +39,8 @@ function CostsPage() {
           void spendSeries.refetch()
           void costs.refetch()
           void quotas.refetch()
+          void costPerSession.refetch()
+          void tokensPerPR.refetch()
         }}
       />
     )
@@ -52,16 +57,19 @@ function CostsPage() {
         <TimeRangeSelector value={range} onChange={setRange} />
       </div>
 
-      <KPICard
-        title="Total Spend"
-        value={`$${costs.data.total_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-      />
+      <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
+        <KPICard
+          title="Total Spend"
+          value={`$${costs.data.total_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+        />
+        {tokensPerPR.data && <TokensPerPRCard data={tokensPerPR.data} />}
+      </Grid>
 
       <SpendTrend data={spendSeries.data} />
 
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
         <CostBreakdownDonut data={costs.data.breakdown} />
-        <CostTrendChart data={costs.data.trend} />
+        {costPerSession.data && <CostTrendChart data={costPerSession.data} />}
       </Grid>
 
       <QuotasList data={quotas.data} />

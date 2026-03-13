@@ -20,6 +20,7 @@ function ErrorBreakdown({ data }: ErrorBreakdownProps) {
         index="type"
         categories={['Count']}
         colors={['red']}
+        yAxisWidth={40}
         showAnimation
       />
     </Card>
