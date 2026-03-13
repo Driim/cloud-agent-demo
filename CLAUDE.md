@@ -31,6 +31,11 @@ npm install                  # install deps
 npm run dev                  # dev server on :5173 (proxies /api → :8000)
 npm run build                # tsc + vite build
 npm run lint                 # eslint
+npm test                     # vitest watch mode
+npm run test:run             # vitest single run
+npm run test:coverage        # vitest + coverage report
+npm run test:e2e             # playwright E2E tests
+npm run test:e2e:ui          # playwright with UI mode
 ```
 
 ## Architecture
@@ -54,9 +59,19 @@ React 18 + Vite + TypeScript (strict mode).
 
 - **Routing**: `router.tsx` — React Router 7, routes: `/`, `/costs`, `/sessions`, `/sessions/:id`, `/team`
 - **Layout**: `components/layout/` — AppLayout with fixed Sidebar (60px) + Header (56px)
-- **Pages**: `pages/` — all currently scaffolds (placeholder content)
+- **Pages**: `pages/` — fully implemented: Overview, Sessions, SessionDetail, Costs, Team
+- **API layer**: `src/api/` — typed clients per domain (sessions, analytics, team, repositories)
+- **Types**: `src/types/api.ts` — shared API response types
+- **Utils**: `src/utils/` — format helpers, error utilities
+- **Hooks**: `src/hooks/` — useSSE (Server-Sent Events for team feed)
 - **State**: TanStack Query v5 configured in `main.tsx` (staleTime: 60s, retry: 1)
 - **UI stack**: Tremor (charts/KPIs), TanStack Table (data grids), Tailwind CSS 4, Headless UI, Remixicon
+
+### Testing (`frontend/`)
+
+- **Unit/integration**: Vitest + Testing Library, config in `vitest.config.ts`, setup in `src/test/setup.ts`
+- **E2E**: Playwright, config in `playwright.config.ts`, specs in `tests/e2e/`, Page Object pattern
+- **Coverage**: `frontend/coverage/` (gitignored in prod, currently committed — consider adding to .gitignore)
 
 ### API Endpoints
 
@@ -82,6 +97,6 @@ Frontend Vite dev server proxies `/api` requests to backend at `localhost:8000`.
 ## Current Status
 
 - Backend: all 5 modules implemented with mock data and tests (~80% coverage)
-- Frontend: layout + routing done, all page components are scaffolds awaiting implementation
+- Frontend: fully implemented — pages, API layer, components, unit + E2E tests
 - No database integration yet (design docs in `clickhouse.md`, `system_design.md`)
 - No Docker or CI/CD configuration
