@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends
 from sse_starlette.sse import EventSourceResponse
 
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, get_current_user_sse
 from app.auth.schemas import UserProfile
 from app.team import service
 from app.team.schemas import TeamMemberStats
@@ -21,7 +21,7 @@ async def get_team_stats(
 
 @router.get("/feed")
 async def get_team_feed(
-    _: UserProfile = Depends(get_current_user),
+    _: UserProfile = Depends(get_current_user_sse),
 ) -> EventSourceResponse:
     """Return an SSE stream of team activity events."""
     return EventSourceResponse(service.stream_activity_feed())
