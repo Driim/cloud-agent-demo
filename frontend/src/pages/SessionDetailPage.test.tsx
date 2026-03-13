@@ -1,19 +1,22 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import type { SessionDetail } from '../types/api'
 import SessionDetailPage from './SessionDetailPage'
 
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
+let mockId: string | undefined = 'sess-test-123'
+
 vi.mock('react-router', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router')>()
   return {
     ...actual,
-    useParams: () => ({ id: 'sess-test-123' }),
+    useParams: () => ({ id: mockId }),
     // Replace Link with plain <a> to avoid router context requirement
     Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
       <a href={String(to)}>{children}</a>
     ),
+    Navigate: ({ to }: { to: string }) => <div data-testid="navigate" data-to={to} />,
   }
 })
 
@@ -58,10 +61,24 @@ function mockSessionQuery(overrides: { isLoading?: boolean; error?: Error | null
     data: makeSession(),
     refetch: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useSession>)
+  } as unknown as ReturnType<typeof useSession>)
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
+
+beforeEach(() => {
+  mockId = 'sess-test-123'
+})
+
+describe('SessionDetailPage — redirect when id is missing', () => {
+  it('redirects to /sessions when id is undefined', () => {
+    mockId = undefined
+    mockSessionQuery()
+    render(<SessionDetailPage />)
+    const nav = screen.getByTestId('navigate')
+    expect(nav).toHaveAttribute('data-to', '/sessions')
+  })
+})
 
 describe('SessionDetailPage — loading / error states', () => {
   it('renders loading skeleton while fetching', () => {

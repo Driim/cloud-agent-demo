@@ -23,4 +23,13 @@ describe('ConcurrentSessions', () => {
     const { container } = render(<ConcurrentSessions data={noAgents} />)
     expect(container.firstChild).toBeNull()
   })
+
+  it('handles limit=0 without division error', () => {
+    const zeroLimit: readonly QuotaItem[] = [
+      { name: 'Concurrent agents', used: 0, limit: 0, unit: 'agents' },
+    ]
+    render(<ConcurrentSessions data={zeroLimit} />)
+    expect(screen.getByText('0 active')).toBeInTheDocument()
+    expect(screen.getByText('0 max')).toBeInTheDocument()
+  })
 })

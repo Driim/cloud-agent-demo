@@ -1,4 +1,5 @@
-import { BarChart, Card, Title } from '@tremor/react'
+import { BarChart, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { ErrorDistributionResponse } from '../../types/api'
 
 interface ErrorBreakdownProps {
@@ -12,7 +13,7 @@ function ErrorBreakdown({ data }: ErrorBreakdownProps) {
   }))
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Error Breakdown</Title>
       <BarChart
         className="mt-4 h-64"
@@ -23,7 +24,7 @@ function ErrorBreakdown({ data }: ErrorBreakdownProps) {
         yAxisWidth={40}
         showAnimation
       />
-    </Card>
+    </DashboardCard>
   )
 }
 

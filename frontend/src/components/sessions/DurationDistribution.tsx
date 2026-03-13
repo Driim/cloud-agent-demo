@@ -1,4 +1,5 @@
-import { BarChart, Card, Title } from '@tremor/react'
+import { BarChart, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { DurationBucket } from '../../types/api'
 
 interface DurationDistributionProps {
@@ -12,7 +13,7 @@ function DurationDistribution({ data }: DurationDistributionProps) {
   }))
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Duration Distribution</Title>
       <BarChart
         className="mt-4 h-72"
@@ -24,7 +25,7 @@ function DurationDistribution({ data }: DurationDistributionProps) {
         yAxisWidth={40}
         showAnimation
       />
-    </Card>
+    </DashboardCard>
   )
 }
 

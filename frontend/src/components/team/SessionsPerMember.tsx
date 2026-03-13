@@ -1,4 +1,5 @@
-import { BarChart, Card, Title } from '@tremor/react'
+import { BarChart, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { TeamMemberStats } from '../../types/api'
 
 interface SessionsPerMemberProps {
@@ -12,7 +13,7 @@ function SessionsPerMember({ data }: SessionsPerMemberProps) {
   }))
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Sessions per Member</Title>
       <BarChart
         className="mt-4 h-72"
@@ -23,7 +24,7 @@ function SessionsPerMember({ data }: SessionsPerMemberProps) {
         yAxisWidth={40}
         showAnimation
       />
-    </Card>
+    </DashboardCard>
   )
 }
 

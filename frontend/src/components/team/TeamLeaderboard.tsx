@@ -6,9 +6,9 @@ import {
   TableRow,
   TableCell,
   Badge,
-  Card,
   Title,
 } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { TeamMemberStats } from '../../types/api'
 
 interface TeamLeaderboardProps {
@@ -19,7 +19,7 @@ function TeamLeaderboard({ data }: TeamLeaderboardProps) {
   const sorted = [...data].sort((a, b) => b.sessions - a.sessions)
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Team Leaderboard</Title>
       <Table className="mt-4">
         <TableHead>
@@ -55,7 +55,7 @@ function TeamLeaderboard({ data }: TeamLeaderboardProps) {
           ))}
         </TableBody>
       </Table>
-    </Card>
+    </DashboardCard>
   )
 }
 

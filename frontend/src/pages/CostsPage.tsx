@@ -57,7 +57,7 @@ function CostsPage() {
         <TimeRangeSelector value={range} onChange={setRange} />
       </div>
 
-      <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
+      <Grid numItemsSm={2} numItemsLg={2} className="gap-6">
         <KPICard
           title="Total Spend"
           value={`$${costs.data.total_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}

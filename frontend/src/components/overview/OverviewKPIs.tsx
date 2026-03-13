@@ -18,7 +18,7 @@ interface OverviewKPIsProps {
 
 function OverviewKPIs({ data }: OverviewKPIsProps) {
   return (
-    <Grid numItemsSm={2} numItemsLg={4} className="gap-6">
+    <Grid numItemsSm={2} numItemsLg={2} className="gap-6">
       <KPICard
         title="Total Sessions"
         value={formatNumber(data.total_sessions)}

@@ -1,4 +1,5 @@
-import { Card, Title } from '@tremor/react'
+import { Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { TimelineEvent } from '../../types/api'
 
 interface SessionTimelineProps {
@@ -7,13 +8,13 @@ interface SessionTimelineProps {
 
 function SessionTimeline({ events }: SessionTimelineProps) {
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Timeline</Title>
       <div className="mt-4 space-y-3">
         {events.map((event, i) => {
           const time = new Date(event.timestamp).toLocaleTimeString()
           return (
-            <div key={i} className="flex gap-3">
+            <div key={`${event.timestamp}-${event.event_type}`} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div className="h-2.5 w-2.5 rounded-full bg-ai-blue mt-1.5" />
                 {i < events.length - 1 && (
@@ -31,7 +32,7 @@ function SessionTimeline({ events }: SessionTimelineProps) {
           )
         })}
       </div>
-    </Card>
+    </DashboardCard>
   )
 }
 

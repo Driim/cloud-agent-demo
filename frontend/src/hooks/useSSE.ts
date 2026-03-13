@@ -6,8 +6,8 @@ interface UseSSEOptions<T> {
   // Token is passed as a query parameter as a workaround — it will appear in server
   // logs and browser history. Use short-lived, read-only tokens only.
   // See: https://github.com/whatwg/fetch/issues/349
-  // TODO: replace with a server-issued short-lived SSE ticket to avoid leaking
-  // the main bearer token in URLs/logs (requires a new backend endpoint).
+  // TODO(backend): replace with a server-issued short-lived SSE ticket
+  // to avoid leaking the main bearer token in URLs and server logs.
   //
   // Accepts a getter function so the latest token is always resolved when
   // reconnecting, rather than the value captured at component mount time.

@@ -1,4 +1,5 @@
-import { Card, Flex, ProgressBar, Text, Title } from '@tremor/react'
+import { Flex, ProgressBar, Text, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { QuotaItem } from '../../types/api'
 
 interface QuotasListProps {
@@ -7,7 +8,7 @@ interface QuotasListProps {
 
 function QuotasList({ data }: QuotasListProps) {
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Usage Quotas</Title>
       <div className="mt-4 space-y-4">
         {data.map((quota) => {
@@ -27,7 +28,7 @@ function QuotasList({ data }: QuotasListProps) {
           )
         })}
       </div>
-    </Card>
+    </DashboardCard>
   )
 }
 

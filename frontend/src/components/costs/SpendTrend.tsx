@@ -1,4 +1,5 @@
-import { Card, LineChart, Title } from '@tremor/react'
+import { LineChart, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { TimeSeriesResponse } from '../../types/api'
 import { formatChartDate } from '../../utils/format'
 
@@ -13,7 +14,7 @@ function SpendTrend({ data }: SpendTrendProps) {
   }))
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Daily Spend Trend</Title>
       <LineChart
         className="mt-4 h-72"
@@ -25,7 +26,7 @@ function SpendTrend({ data }: SpendTrendProps) {
         yAxisWidth={56}
         showAnimation
       />
-    </Card>
+    </DashboardCard>
   )
 }
 

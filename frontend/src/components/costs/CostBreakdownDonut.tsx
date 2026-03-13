@@ -1,4 +1,5 @@
-import { Card, DonutChart, Title } from '@tremor/react'
+import { DonutChart, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { CostLineItem } from '../../types/api'
 
 interface CostBreakdownDonutProps {
@@ -12,7 +13,7 @@ function CostBreakdownDonut({ data }: CostBreakdownDonutProps) {
   }))
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Cost Breakdown</Title>
       <DonutChart
         className="mt-4 h-72"
@@ -23,7 +24,7 @@ function CostBreakdownDonut({ data }: CostBreakdownDonutProps) {
         valueFormatter={(n: number) => `$${n.toFixed(2)}`}
         showAnimation
       />
-    </Card>
+    </DashboardCard>
   )
 }
 

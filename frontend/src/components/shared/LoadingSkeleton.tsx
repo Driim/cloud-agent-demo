@@ -9,7 +9,7 @@ function LoadingSkeleton({ lines = 3 }: LoadingSkeletonProps) {
         <div
           key={`skeleton-${i}`}
           className="h-4 rounded bg-white/10"
-          style={{ width: `${85 - i * 15}%` }}
+          style={{ width: `${Math.max(20, 85 - i * 15)}%` }}
         />
       ))}
     </div>

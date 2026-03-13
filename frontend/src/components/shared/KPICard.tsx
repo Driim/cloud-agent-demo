@@ -1,4 +1,5 @@
-import { BadgeDelta, Card, Flex, Metric, Text } from '@tremor/react'
+import { BadgeDelta, Flex, Metric, Text } from '@tremor/react'
+import DashboardCard from './DashboardCard'
 
 interface KPICardProps {
   readonly title: string
@@ -9,7 +10,7 @@ interface KPICardProps {
 
 function KPICard({ title, value, delta, deltaType }: KPICardProps) {
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Text className="text-neutral-400">{title}</Text>
       <Flex justifyContent="start" alignItems="baseline" className="space-x-3 truncate">
         <Metric className="text-white font-mono">{value}</Metric>
@@ -19,7 +20,7 @@ function KPICard({ title, value, delta, deltaType }: KPICardProps) {
           </BadgeDelta>
         )}
       </Flex>
-    </Card>
+    </DashboardCard>
   )
 }
 

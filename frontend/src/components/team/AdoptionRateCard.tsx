@@ -1,4 +1,5 @@
-import { Card, Flex, Metric, Text, BadgeDelta } from '@tremor/react'
+import { Flex, Metric, Text, BadgeDelta } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { AdoptionRateResponse } from '../../types/api'
 
 interface AdoptionRateCardProps {
@@ -7,7 +8,7 @@ interface AdoptionRateCardProps {
 
 function AdoptionRateCard({ data }: AdoptionRateCardProps) {
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Text className="text-neutral-400">Adoption Rate (7d)</Text>
       <Flex justifyContent="start" alignItems="baseline" className="space-x-3 truncate">
         <Metric className="text-white font-mono">{data.rate_7d}%</Metric>
@@ -21,7 +22,7 @@ function AdoptionRateCard({ data }: AdoptionRateCardProps) {
       <Text className="mt-2 text-neutral-400">
         {data.active_30d}/{data.total_members} members active in 30 days
       </Text>
-    </Card>
+    </DashboardCard>
   )
 }
 

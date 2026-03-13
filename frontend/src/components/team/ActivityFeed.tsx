@@ -1,4 +1,5 @@
-import { Badge, Card, Title } from '@tremor/react'
+import { Badge, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import { useSSE } from '../../hooks/useSSE'
 import { BASE_URL, getAuthToken } from '../../api/client'
 import type { ActivityEvent } from '../../types/api'
@@ -18,7 +19,7 @@ function ActivityFeed() {
   })
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <div className="flex items-center justify-between">
         <Title className="text-white">Activity Feed</Title>
         <div className="flex items-center gap-2">
@@ -60,7 +61,7 @@ function ActivityFeed() {
           )
         })}
       </div>
-    </Card>
+    </DashboardCard>
   )
 }
 

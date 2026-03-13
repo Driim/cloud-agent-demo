@@ -1,5 +1,6 @@
 import { useParams, Link, Navigate } from 'react-router'
-import { Card, Flex, Grid, Metric, Text, Title } from '@tremor/react'
+import { Flex, Grid, Metric, Text, Title } from '@tremor/react'
+import DashboardCard from '../components/shared/DashboardCard'
 import { useSession } from '../api/sessions'
 import StatusBadge from '../components/shared/StatusBadge'
 import SessionTimeline from '../components/sessions/SessionTimeline'
@@ -24,12 +25,11 @@ function isAllowedPrUrl(url: string): boolean {
 
 function SessionDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const session = useSession(id ?? '')
 
   if (!id) {
     return <Navigate to="/sessions" replace />
   }
-
-  const session = useSession(id)
 
   if (session.isLoading) {
     return <LoadingSkeleton lines={8} />
@@ -64,26 +64,26 @@ function SessionDetailPage() {
       </div>
 
       <Grid numItemsSm={2} numItemsLg={4} className="gap-4">
-        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+        <DashboardCard>
           <Text className="text-neutral-400">Repository</Text>
           <Metric className="text-lg text-white">{s.repo}</Metric>
-        </Card>
-        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+        </DashboardCard>
+        <DashboardCard>
           <Text className="text-neutral-400">User</Text>
           <Metric className="text-lg text-white">{s.user}</Metric>
-        </Card>
-        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+        </DashboardCard>
+        <DashboardCard>
           <Text className="text-neutral-400">Duration</Text>
           <Metric className="text-lg text-white font-mono">{formatDuration(s.duration_sec)}</Metric>
-        </Card>
-        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+        </DashboardCard>
+        <DashboardCard>
           <Text className="text-neutral-400">Cost</Text>
           <Metric className="text-lg text-white font-mono">${s.cost_usd.toFixed(2)}</Metric>
-        </Card>
+        </DashboardCard>
       </Grid>
 
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
-        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+        <DashboardCard>
           <Title className="text-white">Details</Title>
           <div className="mt-4 space-y-2 text-sm">
             <Flex>
@@ -124,7 +124,7 @@ function SessionDetailPage() {
               <Text className="text-neutral-300">{new Date(s.finished_at).toLocaleString()}</Text>
             </Flex>
           </div>
-        </Card>
+        </DashboardCard>
 
         <SessionTimeline events={s.timeline} />
       </Grid>

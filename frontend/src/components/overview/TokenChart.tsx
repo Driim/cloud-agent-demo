@@ -1,4 +1,5 @@
-import { Card, Title, AreaChart } from '@tremor/react'
+import { Title, AreaChart } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { MultiSeriesResponse } from '../../types/api'
 import { formatChartDate } from '../../utils/format'
 
@@ -14,7 +15,7 @@ function TokenChart({ data }: TokenChartProps) {
   }))
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Token Consumption</Title>
       <AreaChart
         className="mt-4 h-72"
@@ -29,7 +30,7 @@ function TokenChart({ data }: TokenChartProps) {
         yAxisWidth={56}
         showAnimation
       />
-    </Card>
+    </DashboardCard>
   )
 }
 

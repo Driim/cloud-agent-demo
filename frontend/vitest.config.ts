@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     setupFiles: ['./src/test/setup.ts'],
     coverage: {
       provider: 'v8',
@@ -27,7 +28,9 @@ export default defineConfig({
         'src/api/team.ts',
         'src/api/repositories.ts',
         // Pure Tremor chart wrappers — no business logic
-        'src/components/costs/**',
+        'src/components/costs/SpendTrend.tsx',
+        'src/components/costs/CostBreakdownDonut.tsx',
+        'src/components/costs/CostTrendChart.tsx',
         'src/components/overview/**',
         'src/components/layout/**',
         'src/components/team/**',
@@ -36,12 +39,10 @@ export default defineConfig({
         'src/components/sessions/SessionFilters.tsx',
         'src/components/sessions/ErrorBreakdown.tsx',
         'src/components/shared/KPICard.tsx',
-        'src/components/shared/LoadingSkeleton.tsx',
         'src/components/shared/TimeRangeSelector.tsx',
         // Page scaffolds without testable business logic
         'src/pages/CostsPage.tsx',
         'src/pages/OverviewPage.tsx',
-        'src/pages/SessionsPage.tsx',
         'src/pages/TeamPage.tsx',
       ],
       thresholds: {

@@ -1,4 +1,5 @@
-import { Card, DonutChart, Title } from '@tremor/react'
+import { DonutChart, Title } from '@tremor/react'
+import DashboardCard from '../shared/DashboardCard'
 import type { SessionOutcomesResponse } from '../../types/api'
 
 interface OutcomesDonutProps {
@@ -19,7 +20,7 @@ function OutcomesDonut({ data }: OutcomesDonutProps) {
   }))
 
   return (
-    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+    <DashboardCard>
       <Title className="text-white">Session Outcomes</Title>
       <DonutChart
         className="mt-4 h-72"
@@ -30,7 +31,7 @@ function OutcomesDonut({ data }: OutcomesDonutProps) {
         valueFormatter={(n: number) => n.toString()}
         showAnimation
       />
-    </Card>
+    </DashboardCard>
   )
 }
 
