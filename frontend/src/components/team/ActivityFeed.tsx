@@ -18,26 +18,26 @@ function ActivityFeed() {
   })
 
   return (
-    <Card>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
       <div className="flex items-center justify-between">
-        <Title>Activity Feed</Title>
+        <Title className="text-white">Activity Feed</Title>
         <div className="flex items-center gap-2">
           <span
-            className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-300'}`}
+            className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-neutral-600'}`}
           />
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-neutral-400">
             {isConnected ? 'Live' : 'Disconnected'}
           </span>
         </div>
       </div>
 
       {error && (
-        <p className="mt-2 text-xs text-red-500">{error}</p>
+        <p className="mt-2 text-xs text-red-400">{error}</p>
       )}
 
       <div className="mt-4 space-y-3 max-h-96 overflow-y-auto">
         {events.length === 0 && (
-          <p className="text-sm text-gray-400">Waiting for events...</p>
+          <p className="text-sm text-neutral-500">Waiting for events...</p>
         )}
         {events.map((event) => {
           const time = new Date(event.timestamp).toLocaleTimeString()
@@ -48,14 +48,14 @@ function ActivityFeed() {
                 {event.event_type.replace(/_/g, ' ')}
               </Badge>
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-700 truncate">
-                  <span className="font-medium">{event.user}</span>
+                <p className="text-sm text-neutral-300 truncate">
+                  <span className="font-medium text-white">{event.user}</span>
                   {' · '}
                   {event.repo}
                 </p>
-                <p className="text-xs text-gray-500">{event.description}</p>
+                <p className="text-xs text-neutral-500">{event.description}</p>
               </div>
-              <span className="text-xs text-gray-400 shrink-0">{time}</span>
+              <span className="text-xs text-neutral-500 shrink-0">{time}</span>
             </div>
           )
         })}

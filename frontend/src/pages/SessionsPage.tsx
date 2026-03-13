@@ -46,7 +46,7 @@ function SessionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Title>Agent Sessions</Title>
+        <Title className="text-white">Agent Sessions</Title>
         <SessionFilters status={status} onStatusChange={(s) => { setStatus(s); setCursor(undefined) }} />
       </div>
 

@@ -16,11 +16,11 @@ function ConcurrentSessions({ data }: ConcurrentSessionsProps) {
   const color = pct >= 90 ? 'red' : pct >= 75 ? 'amber' : 'emerald'
 
   return (
-    <Card>
-      <Title>Concurrent Sessions</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Concurrent Sessions</Title>
       <Flex className="mt-4">
-        <Text>{quota.used} active</Text>
-        <Text>{quota.limit} max</Text>
+        <Text className="text-neutral-300">{quota.used} active</Text>
+        <Text className="text-neutral-400">{quota.limit} max</Text>
       </Flex>
       <ProgressBar value={pct} color={color} className="mt-2" />
     </Card>

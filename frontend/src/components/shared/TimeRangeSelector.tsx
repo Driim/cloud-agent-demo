@@ -13,17 +13,17 @@ interface TimeRangeSelectorProps {
 
 function TimeRangeSelector({ value, onChange }: TimeRangeSelectorProps) {
   return (
-    <div className="inline-flex rounded-md border border-gray-200 bg-white">
+    <div className="inline-flex rounded-lg border border-white/10 bg-surface">
       {RANGES.map(({ value: rangeValue, label }) => (
         <button
           key={rangeValue}
           type="button"
           onClick={() => onChange(rangeValue)}
           className={[
-            'px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-md last:rounded-r-md',
+            'px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg',
             value === rangeValue
-              ? 'bg-indigo-600 text-white'
-              : 'text-gray-600 hover:bg-gray-50',
+              ? 'bg-ai-blue text-white'
+              : 'text-neutral-400 hover:bg-white/5 hover:text-white',
           ].join(' ')}
         >
           {label}

@@ -42,7 +42,7 @@ function OverviewPage() {
 
   return (
     <div className="space-y-6">
-      <Title>Overview</Title>
+      <Title className="text-white">Overview</Title>
       <OverviewKPIs data={overview.data} />
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
         <TokenChart data={tokenBreakdown.data} />

@@ -12,8 +12,8 @@ function ErrorBreakdown({ data }: ErrorBreakdownProps) {
   }))
 
   return (
-    <Card>
-      <Title>Error Breakdown</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Error Breakdown</Title>
       <BarChart
         className="mt-4 h-64"
         data={chartData}

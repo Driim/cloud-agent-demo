@@ -13,14 +13,14 @@ function SpendTrend({ data }: SpendTrendProps) {
   }))
 
   return (
-    <Card>
-      <Title>Daily Spend Trend</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Daily Spend Trend</Title>
       <LineChart
         className="mt-4 h-72"
         data={chartData}
         index="date"
         categories={['Spend']}
-        colors={['indigo']}
+        colors={['blue']}
         valueFormatter={(n: number) => `$${n.toFixed(2)}`}
         yAxisWidth={56}
         showAnimation

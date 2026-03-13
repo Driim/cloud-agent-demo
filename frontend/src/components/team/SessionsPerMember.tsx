@@ -12,14 +12,14 @@ function SessionsPerMember({ data }: SessionsPerMemberProps) {
   }))
 
   return (
-    <Card>
-      <Title>Sessions per Member</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Sessions per Member</Title>
       <BarChart
         className="mt-4 h-72"
         data={chartData}
         index="name"
         categories={['Sessions']}
-        colors={['indigo']}
+        colors={['blue']}
         yAxisWidth={40}
         showAnimation
       />

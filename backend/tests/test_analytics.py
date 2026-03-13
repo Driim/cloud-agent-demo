@@ -159,9 +159,7 @@ class TestAnalyticsEndpoints:
 
     @pytest.mark.asyncio
     async def test_token_breakdown(self, client: AsyncClient) -> None:
-        resp = await client.get(
-            "/api/v1/analytics/token-breakdown?range=30d"
-        )
+        resp = await client.get("/api/v1/analytics/token-breakdown?range=30d")
         assert resp.status_code == 200
         body = resp.json()
         assert body["metric"] == "token_breakdown"
@@ -186,23 +184,15 @@ class TestAnalyticsEndpoints:
         assert "delta_pct" in body
 
     @pytest.mark.asyncio
-    async def test_duration_distribution(
-        self, client: AsyncClient
-    ) -> None:
-        resp = await client.get(
-            "/api/v1/analytics/duration-distribution"
-        )
+    async def test_duration_distribution(self, client: AsyncClient) -> None:
+        resp = await client.get("/api/v1/analytics/duration-distribution")
         assert resp.status_code == 200
         body = resp.json()
         assert len(body) == 4
 
     @pytest.mark.asyncio
-    async def test_timeseries_latency_p95(
-        self, client: AsyncClient
-    ) -> None:
-        resp = await client.get(
-            "/api/v1/analytics/timeseries/latency_p95?range=30d"
-        )
+    async def test_timeseries_latency_p95(self, client: AsyncClient) -> None:
+        resp = await client.get("/api/v1/analytics/timeseries/latency_p95?range=30d")
         assert resp.status_code == 200
         body = resp.json()
         assert body["metric"] == "latency_p95"

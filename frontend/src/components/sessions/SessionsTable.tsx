@@ -35,7 +35,7 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
       columnHelper.accessor('session_id', {
         header: 'Session',
         cell: (info) => (
-          <span className="font-mono text-xs">{info.getValue().slice(0, 12)}...</span>
+          <span className="font-mono text-xs text-ai-purple">{info.getValue().slice(0, 12)}...</span>
         ),
       }),
       columnHelper.accessor('user', {
@@ -45,7 +45,7 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
       columnHelper.accessor('repo', {
         header: 'Repository',
         cell: (info) => (
-          <span className="font-medium text-gray-700">{info.getValue()}</span>
+          <span className="font-medium text-neutral-300">{info.getValue()}</span>
         ),
       }),
       columnHelper.accessor('status', {
@@ -54,21 +54,21 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
       }),
       columnHelper.accessor('duration_sec', {
         header: 'Duration',
-        cell: (info) => formatDuration(info.getValue()),
+        cell: (info) => <span className="font-mono">{formatDuration(info.getValue())}</span>,
       }),
       columnHelper.accessor('tokens_used', {
         header: 'Tokens',
-        cell: (info) => info.getValue().toLocaleString(),
+        cell: (info) => <span className="font-mono">{info.getValue().toLocaleString()}</span>,
       }),
       columnHelper.accessor('cost_usd', {
         header: 'Cost',
-        cell: (info) => `$${info.getValue().toFixed(2)}`,
+        cell: (info) => <span className="font-mono">${info.getValue().toFixed(2)}</span>,
       }),
       columnHelper.accessor('pr_number', {
         header: 'PR',
         cell: (info) => {
           const pr = info.getValue()
-          return pr ? `#${pr}` : '—'
+          return pr ? <span className="font-mono">#{pr}</span> : '—'
         },
       }),
     ],
@@ -99,7 +99,7 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
           {table.getRowModel().rows.map((row) => (
             <TableRow
               key={row.id}
-              className="cursor-pointer hover:bg-gray-50"
+              className="cursor-pointer hover:bg-white/[0.02] transition-colors"
               onClick={() => navigate(`/sessions/${row.original.session_id}`)}
             >
               {row.getVisibleCells().map((cell) => (
@@ -112,14 +112,14 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
         </TableBody>
       </Table>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+      <div className="mt-4 flex items-center justify-between text-sm text-neutral-400">
         <span>~{pagination.approx_total.toLocaleString()} sessions total</span>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={onPrevPage}
             disabled={!pagination.prev_cursor}
-            className="rounded px-3 py-1 border border-gray-200 disabled:opacity-40 hover:bg-gray-50"
+            className="rounded-lg px-3 py-1 border border-white/10 text-neutral-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
           >
             Previous
           </button>
@@ -127,7 +127,7 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
             type="button"
             onClick={onNextPage}
             disabled={!pagination.has_more}
-            className="rounded px-3 py-1 border border-gray-200 disabled:opacity-40 hover:bg-gray-50"
+            className="rounded-lg px-3 py-1 border border-white/10 text-neutral-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
           >
             Next
           </button>

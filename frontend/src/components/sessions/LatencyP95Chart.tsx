@@ -13,14 +13,14 @@ function LatencyP95Chart({ data }: LatencyP95ChartProps) {
   }))
 
   return (
-    <Card>
-      <Title>P95 Latency Trend</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">P95 Latency Trend</Title>
       <LineChart
         className="mt-4 h-72"
         data={chartData}
         index="date"
         categories={['P95 (ms)']}
-        colors={['rose']}
+        colors={['violet']}
         valueFormatter={(n: number) => `${Math.round(n)}ms`}
         yAxisWidth={56}
         showAnimation

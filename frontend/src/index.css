@@ -1,7 +1,133 @@
 @import "tailwindcss";
+@source "./tremor-safelist.txt";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-surface: #121212;
+  --color-surface-hover: #1A1A1A;
+
+  --color-ai-blue: #3B82F6;
+  --color-ai-purple: #8B5CF6;
+}
+
+@layer base {
+  body {
+    background-color: #0A0A0A;
+    color: var(--color-neutral-300, #D4D4D4);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgb(139 92 246 / 0.3);
+  }
+}
 
 /* Fix Recharts Y-axis label clipping */
 .recharts-wrapper,
 .recharts-surface {
   overflow: visible !important;
+}
+
+/* Override Tremor card backgrounds for dark theme */
+[data-tremor-id] {
+  --tw-ring-color: transparent !important;
+}
+
+/* --- Recharts / Tremor chart dark overrides --- */
+
+/* Axis tick labels */
+.recharts-cartesian-axis-tick-value {
+  fill: #a3a3a3 !important; /* neutral-400 */
+}
+
+/* Axis lines */
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line {
+  stroke: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Grid lines */
+.recharts-cartesian-grid line {
+  stroke: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Legend text */
+.recharts-legend-item-text {
+  color: #a3a3a3 !important;
+}
+
+/* Tooltip */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: #1a1a1a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.recharts-tooltip-item {
+  color: #d4d4d4 !important;
+}
+
+.recharts-tooltip-label {
+  color: #ffffff !important;
+}
+
+/* Tremor-specific tooltip & label overrides */
+.tremor-content {
+  color: #d4d4d4 !important;
+}
+
+/* Tremor Table dark overrides */
+[class*="tremor-Table"] {
+  background-color: transparent !important;
+}
+
+[class*="tremor-TableHead"] {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+[class*="tremor-TableHeaderCell"] {
+  color: #a3a3a3 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+}
+
+[class*="tremor-TableCell"] {
+  color: #d4d4d4 !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[class*="tremor-TableRow"]:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Tremor Select dark override */
+[class*="tremor-Select"] button,
+[class*="tremor-Select"] [role="listbox"] {
+  background-color: #121212 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #d4d4d4 !important;
+}
+
+[class*="tremor-SelectItem"] {
+  color: #d4d4d4 !important;
+}
+
+[class*="tremor-SelectItem"]:hover,
+[class*="tremor-SelectItem"][data-headlessui-state~="active"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Tremor ProgressBar track */
+[class*="tremor-ProgressBar"] > div:first-child {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Donut chart center label */
+.recharts-text.recharts-label {
+  fill: #ffffff !important;
 }

@@ -9,8 +9,8 @@ const NAV_ITEMS = [
 
 function Sidebar() {
   return (
-    <aside className="fixed top-0 left-0 h-screen w-60 bg-gray-900 flex flex-col z-10">
-      <div className="px-6 py-5 border-b border-gray-700">
+    <aside className="fixed top-0 left-0 h-screen w-60 bg-[#0A0A0A] border-r border-white/10 flex flex-col z-10">
+      <div className="px-6 py-5 border-b border-white/10">
         <span className="text-white font-bold text-lg tracking-tight">AgentCloud</span>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -21,10 +21,10 @@ function Sidebar() {
             end={to === '/'}
             className={({ isActive }) =>
               [
-                'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                  ? 'bg-ai-blue/15 text-ai-blue'
+                  : 'text-neutral-400 hover:bg-white/5 hover:text-white',
               ].join(' ')
             }
           >

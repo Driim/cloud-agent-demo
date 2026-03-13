@@ -12,14 +12,14 @@ function DurationDistribution({ data }: DurationDistributionProps) {
   }))
 
   return (
-    <Card>
-      <Title>Duration Distribution</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Duration Distribution</Title>
       <BarChart
         className="mt-4 h-72"
         data={chartData}
         index="bucket"
         categories={['Sessions']}
-        colors={['indigo']}
+        colors={['blue']}
         valueFormatter={(n: number) => n.toString()}
         yAxisWidth={40}
         showAnimation

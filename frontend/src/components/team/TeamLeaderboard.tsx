@@ -19,8 +19,8 @@ function TeamLeaderboard({ data }: TeamLeaderboardProps) {
   const sorted = [...data].sort((a, b) => b.sessions - a.sessions)
 
   return (
-    <Card>
-      <Title>Team Leaderboard</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Team Leaderboard</Title>
       <Table className="mt-4">
         <TableHead>
           <TableRow>
@@ -36,11 +36,11 @@ function TeamLeaderboard({ data }: TeamLeaderboardProps) {
           {sorted.map((member) => (
             <TableRow key={member.user}>
               <TableCell>
-                <span className="font-medium">{member.display_name}</span>
-                <span className="ml-2 text-xs text-gray-400">{member.user}</span>
+                <span className="font-medium text-white">{member.display_name}</span>
+                <span className="ml-2 text-xs text-neutral-500">{member.user}</span>
               </TableCell>
-              <TableCell>{member.sessions}</TableCell>
-              <TableCell>{member.prs_merged}</TableCell>
+              <TableCell><span className="font-mono">{member.sessions}</span></TableCell>
+              <TableCell><span className="font-mono">{member.prs_merged}</span></TableCell>
               <TableCell>
                 <Badge
                   color={member.success_rate >= 0.8 ? 'green' : member.success_rate >= 0.5 ? 'amber' : 'red'}
@@ -49,8 +49,8 @@ function TeamLeaderboard({ data }: TeamLeaderboardProps) {
                   {(member.success_rate * 100).toFixed(0)}%
                 </Badge>
               </TableCell>
-              <TableCell>{Math.round(member.avg_session_duration_sec / 60)}m</TableCell>
-              <TableCell>${member.total_cost_usd.toFixed(2)}</TableCell>
+              <TableCell><span className="font-mono">{Math.round(member.avg_session_duration_sec / 60)}m</span></TableCell>
+              <TableCell><span className="font-mono">${member.total_cost_usd.toFixed(2)}</span></TableCell>
             </TableRow>
           ))}
         </TableBody>

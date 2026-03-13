@@ -8,7 +8,7 @@ function LoadingSkeleton({ lines = 3 }: LoadingSkeletonProps) {
       {Array.from({ length: lines }, (_, i) => (
         <div
           key={`skeleton-${i}`}
-          className="h-4 rounded bg-gray-200"
+          className="h-4 rounded bg-white/10"
           style={{ width: `${85 - i * 15}%` }}
         />
       ))}

@@ -21,7 +21,7 @@ function BudgetAlerts({ quotas }: BudgetAlertsProps) {
             ? `${alert.name}: Limit reached`
             : `${alert.name}: ${alert.pct.toFixed(0)}% consumed`
         return (
-          <Callout key={alert.name} title={title} color={color}>
+          <Callout key={alert.name} title={title} color={color} className="bg-white/5 border border-white/10 !ring-0">
             {alert.used.toLocaleString()} of {alert.limit.toLocaleString()} {alert.unit} used.
           </Callout>
         )

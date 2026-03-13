@@ -12,14 +12,14 @@ function TopReposBar({ data }: TopReposBarProps) {
   }))
 
   return (
-    <Card>
-      <Title>Top Repositories</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Top Repositories</Title>
       <BarChart
         className="mt-4 h-72"
         data={chartData}
         index="repo"
         categories={['Sessions']}
-        colors={['indigo']}
+        colors={['blue']}
         layout="vertical"
         yAxisWidth={100}
         showAnimation

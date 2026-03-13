@@ -9,10 +9,10 @@ interface KPICardProps {
 
 function KPICard({ title, value, delta, deltaType }: KPICardProps) {
   return (
-    <Card>
-      <Text>{title}</Text>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Text className="text-neutral-400">{title}</Text>
       <Flex justifyContent="start" alignItems="baseline" className="space-x-3 truncate">
-        <Metric>{value}</Metric>
+        <Metric className="text-white font-mono">{value}</Metric>
         {delta && deltaType && (
           <BadgeDelta deltaType={deltaType} size="xs">
             {delta}

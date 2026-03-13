@@ -13,14 +13,14 @@ function CostTrendChart({ data }: CostTrendChartProps) {
   }))
 
   return (
-    <Card>
-      <Title>Cost per Session</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Cost per Session</Title>
       <LineChart
         className="mt-4 h-72"
         data={chartData}
         index="date"
         categories={['Cost per Session']}
-        colors={['indigo']}
+        colors={['violet']}
         valueFormatter={(n: number) => `$${n.toFixed(2)}`}
         yAxisWidth={56}
         showAnimation

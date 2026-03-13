@@ -53,7 +53,7 @@ function CostsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Title>Usage &amp; Costs</Title>
+        <Title className="text-white">Usage &amp; Costs</Title>
         <TimeRangeSelector value={range} onChange={setRange} />
       </div>
 

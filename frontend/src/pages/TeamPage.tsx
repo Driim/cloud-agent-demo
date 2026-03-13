@@ -35,7 +35,7 @@ function TeamPage() {
 
   return (
     <div className="space-y-6">
-      <Title>Team Activity</Title>
+      <Title className="text-white">Team Activity</Title>
       {adoptionRate.data && <AdoptionRateCard data={adoptionRate.data} />}
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
         <SessionsPerMember data={team.data} />

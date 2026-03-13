@@ -7,10 +7,10 @@ interface AdoptionRateCardProps {
 
 function AdoptionRateCard({ data }: AdoptionRateCardProps) {
   return (
-    <Card>
-      <Text>Adoption Rate (7d)</Text>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Text className="text-neutral-400">Adoption Rate (7d)</Text>
       <Flex justifyContent="start" alignItems="baseline" className="space-x-3 truncate">
-        <Metric>{data.rate_7d}%</Metric>
+        <Metric className="text-white font-mono">{data.rate_7d}%</Metric>
         <BadgeDelta
           deltaType={data.delta_7d_pct >= 0 ? 'moderateIncrease' : 'moderateDecrease'}
           size="xs"
@@ -18,7 +18,7 @@ function AdoptionRateCard({ data }: AdoptionRateCardProps) {
           {data.delta_7d_pct >= 0 ? '+' : ''}{data.delta_7d_pct}%
         </BadgeDelta>
       </Flex>
-      <Text className="mt-2">
+      <Text className="mt-2 text-neutral-400">
         {data.active_30d}/{data.total_members} members active in 30 days
       </Text>
     </Card>

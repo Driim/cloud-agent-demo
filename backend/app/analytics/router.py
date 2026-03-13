@@ -22,7 +22,14 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 _VALID_RANGES = {"7d", "30d", "90d"}
 _VALID_GRANULARITIES = {"hour", "day"}
-_VALID_METRICS = {"tokens", "sessions", "spend", "prs", "latency_p95", "cost_per_session"}
+_VALID_METRICS = {
+    "tokens",
+    "sessions",
+    "spend",
+    "prs",
+    "latency_p95",
+    "cost_per_session",
+}
 
 
 @router.get("/overview", response_model=OverviewResponse)

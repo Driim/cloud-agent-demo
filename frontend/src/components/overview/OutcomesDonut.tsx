@@ -19,8 +19,8 @@ function OutcomesDonut({ data }: OutcomesDonutProps) {
   }))
 
   return (
-    <Card>
-      <Title>Session Outcomes</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Session Outcomes</Title>
       <DonutChart
         className="mt-4 h-72"
         data={chartData}

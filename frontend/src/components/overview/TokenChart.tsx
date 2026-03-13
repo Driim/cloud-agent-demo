@@ -14,14 +14,14 @@ function TokenChart({ data }: TokenChartProps) {
   }))
 
   return (
-    <Card>
-      <Title>Token Consumption</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Token Consumption</Title>
       <AreaChart
         className="mt-4 h-72"
         data={chartData}
         index="date"
         categories={['Input Tokens', 'Output Tokens']}
-        colors={['indigo', 'cyan']}
+        colors={['blue', 'violet']}
         stack
         valueFormatter={(n: number) =>
           n >= 1_000 ? `${(n / 1_000).toFixed(1)}k` : n.toString()

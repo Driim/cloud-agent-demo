@@ -12,14 +12,14 @@ function CostBreakdownDonut({ data }: CostBreakdownDonutProps) {
   }))
 
   return (
-    <Card>
-      <Title>Cost Breakdown</Title>
+    <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+      <Title className="text-white">Cost Breakdown</Title>
       <DonutChart
         className="mt-4 h-72"
         data={chartData}
         category="value"
         index="name"
-        colors={['indigo', 'cyan', 'amber', 'emerald']}
+        colors={['blue', 'violet', 'amber', 'emerald']}
         valueFormatter={(n: number) => `$${n.toFixed(2)}`}
         showAnimation
       />

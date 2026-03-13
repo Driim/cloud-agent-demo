@@ -55,73 +55,73 @@ function SessionDetailPage() {
       <div className="flex items-center gap-3">
         <Link
           to="/sessions"
-          className="text-sm text-indigo-600 hover:text-indigo-800"
+          className="text-sm text-ai-blue hover:text-blue-400"
         >
           &larr; Back
         </Link>
-        <Title>Session {s.session_id.slice(0, 12)}...</Title>
+        <Title className="text-white">Session {s.session_id.slice(0, 12)}...</Title>
         <StatusBadge status={s.status} />
       </div>
 
       <Grid numItemsSm={2} numItemsLg={4} className="gap-4">
-        <Card>
-          <Text>Repository</Text>
-          <Metric className="text-lg">{s.repo}</Metric>
+        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+          <Text className="text-neutral-400">Repository</Text>
+          <Metric className="text-lg text-white">{s.repo}</Metric>
         </Card>
-        <Card>
-          <Text>User</Text>
-          <Metric className="text-lg">{s.user}</Metric>
+        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+          <Text className="text-neutral-400">User</Text>
+          <Metric className="text-lg text-white">{s.user}</Metric>
         </Card>
-        <Card>
-          <Text>Duration</Text>
-          <Metric className="text-lg">{formatDuration(s.duration_sec)}</Metric>
+        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+          <Text className="text-neutral-400">Duration</Text>
+          <Metric className="text-lg text-white font-mono">{formatDuration(s.duration_sec)}</Metric>
         </Card>
-        <Card>
-          <Text>Cost</Text>
-          <Metric className="text-lg">${s.cost_usd.toFixed(2)}</Metric>
+        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+          <Text className="text-neutral-400">Cost</Text>
+          <Metric className="text-lg text-white font-mono">${s.cost_usd.toFixed(2)}</Metric>
         </Card>
       </Grid>
 
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
-        <Card>
-          <Title>Details</Title>
+        <Card className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-xl !ring-0">
+          <Title className="text-white">Details</Title>
           <div className="mt-4 space-y-2 text-sm">
             <Flex>
-              <Text>Branch</Text>
-              <Text className="font-mono">{s.branch}</Text>
+              <Text className="text-neutral-400">Branch</Text>
+              <Text className="font-mono text-ai-purple">{s.branch}</Text>
             </Flex>
             <Flex>
-              <Text>Commits</Text>
-              <Text>{s.commit_count}</Text>
+              <Text className="text-neutral-400">Commits</Text>
+              <Text className="text-neutral-300">{s.commit_count}</Text>
             </Flex>
             <Flex>
-              <Text>Files Changed</Text>
-              <Text>{s.files_changed}</Text>
+              <Text className="text-neutral-400">Files Changed</Text>
+              <Text className="text-neutral-300">{s.files_changed}</Text>
             </Flex>
             <Flex>
-              <Text>Tokens Used</Text>
-              <Text>{s.tokens_used.toLocaleString()}</Text>
+              <Text className="text-neutral-400">Tokens Used</Text>
+              <Text className="text-neutral-300 font-mono">{s.tokens_used.toLocaleString()}</Text>
             </Flex>
             {s.pr_url && isAllowedPrUrl(s.pr_url) && (
               <Flex>
-                <Text>Pull Request</Text>
+                <Text className="text-neutral-400">Pull Request</Text>
                 <a
                   href={s.pr_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 hover:underline"
+                  className="text-ai-blue hover:underline"
                 >
                   #{s.pr_number}
                 </a>
               </Flex>
             )}
             <Flex>
-              <Text>Started</Text>
-              <Text>{new Date(s.started_at).toLocaleString()}</Text>
+              <Text className="text-neutral-400">Started</Text>
+              <Text className="text-neutral-300">{new Date(s.started_at).toLocaleString()}</Text>
             </Flex>
             <Flex>
-              <Text>Finished</Text>
-              <Text>{new Date(s.finished_at).toLocaleString()}</Text>
+              <Text className="text-neutral-400">Finished</Text>
+              <Text className="text-neutral-300">{new Date(s.finished_at).toLocaleString()}</Text>
             </Flex>
           </div>
         </Card>
