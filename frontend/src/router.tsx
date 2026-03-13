@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, Navigate } from 'react-router'
 import AppLayout from './components/layout/AppLayout'
 import OverviewPage from './pages/OverviewPage'
 import CostsPage from './pages/CostsPage'
@@ -16,6 +16,7 @@ const router = createBrowserRouter([
       { path: 'sessions', element: <SessionsPage /> },
       { path: 'sessions/:id', element: <SessionDetailPage /> },
       { path: 'team', element: <TeamPage /> },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ])

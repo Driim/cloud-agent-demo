@@ -1,8 +1,40 @@
+import { Grid, Title } from '@tremor/react'
+import { useTeamStats } from '../api/team'
+import SessionsPerMember from '../components/team/SessionsPerMember'
+import TeamLeaderboard from '../components/team/TeamLeaderboard'
+import ActivityFeed from '../components/team/ActivityFeed'
+import LoadingSkeleton from '../components/shared/LoadingSkeleton'
+import ErrorState from '../components/shared/ErrorState'
+import { sanitizeApiError } from '../utils/errors'
+
 function TeamPage() {
+  const team = useTeamStats()
+
+  if (team.isLoading) {
+    return <LoadingSkeleton lines={6} />
+  }
+
+  if (team.error) {
+    return (
+      <ErrorState
+        message={sanitizeApiError(team.error)}
+        onRetry={() => { void team.refetch() }}
+      />
+    )
+  }
+
+  if (!team.data) {
+    return null
+  }
+
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-800">Team Activity</h2>
-      <p className="mt-2 text-gray-500">Team page — coming soon.</p>
+    <div className="space-y-6">
+      <Title>Team Activity</Title>
+      <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
+        <SessionsPerMember data={team.data} />
+        <ActivityFeed />
+      </Grid>
+      <TeamLeaderboard data={team.data} />
     </div>
   )
 }

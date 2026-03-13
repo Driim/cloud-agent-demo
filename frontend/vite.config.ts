@@ -6,6 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
+        // Dev-only: proxies to local backend over plain HTTP (localhost only).
+        // Production must serve over HTTPS — never deploy this config as-is.
         target: 'http://localhost:8000',
         changeOrigin: true,
       },

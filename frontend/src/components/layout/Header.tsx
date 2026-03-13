@@ -1,3 +1,4 @@
+// TODO: replace with real user profile from GET /auth/me once auth context is wired up
 const ORG_NAME = 'Acme Corp'
 const USER_EMAIL = 'admin@acme.corp'
 const USER_ROLE = 'Admin'

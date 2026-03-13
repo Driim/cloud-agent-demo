@@ -1,8 +1,71 @@
+import { useState } from 'react'
+import { Grid, Title } from '@tremor/react'
+import { useCosts, useTimeseries, useQuotas } from '../api/analytics'
+import SpendTrend from '../components/costs/SpendTrend'
+import CostBreakdownDonut from '../components/costs/CostBreakdownDonut'
+import CostTrendChart from '../components/costs/CostTrendChart'
+import QuotasList from '../components/costs/QuotasList'
+import BudgetAlerts from '../components/costs/BudgetAlerts'
+import KPICard from '../components/shared/KPICard'
+import TimeRangeSelector from '../components/shared/TimeRangeSelector'
+import LoadingSkeleton from '../components/shared/LoadingSkeleton'
+import ErrorState from '../components/shared/ErrorState'
+import { sanitizeApiError } from '../utils/errors'
+import type { TimeSeriesRange } from '../types/api'
+
 function CostsPage() {
+  const [range, setRange] = useState<TimeSeriesRange>('30d')
+  const spendSeries = useTimeseries('spend', range)
+  const costs = useCosts()
+  const quotas = useQuotas()
+
+  if (spendSeries.isLoading || costs.isLoading || quotas.isLoading) {
+    return <LoadingSkeleton lines={6} />
+  }
+
+  const pageErrors = [spendSeries.error, costs.error, quotas.error].filter(Boolean) as Error[]
+  if (pageErrors.length > 0) {
+    const message =
+      pageErrors.length === 1
+        ? sanitizeApiError(pageErrors[0])
+        : `${pageErrors.length} data sources failed — ${sanitizeApiError(pageErrors[0])}`
+    return (
+      <ErrorState
+        message={message}
+        onRetry={() => {
+          void spendSeries.refetch()
+          void costs.refetch()
+          void quotas.refetch()
+        }}
+      />
+    )
+  }
+
+  if (!spendSeries.data || !costs.data || !quotas.data) {
+    return null
+  }
+
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-800">Usage &amp; Costs</h2>
-      <p className="mt-2 text-gray-500">Costs page — coming soon.</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <Title>Usage &amp; Costs</Title>
+        <TimeRangeSelector value={range} onChange={setRange} />
+      </div>
+
+      <KPICard
+        title="Total Spend"
+        value={`$${costs.data.total_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+      />
+
+      <SpendTrend data={spendSeries.data} />
+
+      <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
+        <CostBreakdownDonut data={costs.data.breakdown} />
+        <CostTrendChart data={costs.data.trend} />
+      </Grid>
+
+      <QuotasList data={quotas.data} />
+      <BudgetAlerts quotas={quotas.data} />
     </div>
   )
 }
