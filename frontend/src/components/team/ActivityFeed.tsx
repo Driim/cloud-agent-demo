@@ -1,5 +1,6 @@
 import { Badge, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import UserAvatar from '../shared/UserAvatar'
 import { useSSE } from '../../hooks/useSSE'
 import { BASE_URL, getAuthToken } from '../../api/client'
 import type { ActivityEvent } from '../../types/api'
@@ -45,6 +46,7 @@ function ActivityFeed() {
           const color = EVENT_COLORS[event.event_type] ?? 'gray'
           return (
             <div key={event.event_id} className="flex items-start gap-3">
+              <UserAvatar name={event.user} size="sm" />
               <Badge color={color} size="xs" className="mt-0.5 shrink-0">
                 {event.event_type.replace(/_/g, ' ')}
               </Badge>

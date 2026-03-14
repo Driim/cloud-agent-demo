@@ -92,11 +92,11 @@ function SessionDetailPage() {
             </Flex>
             <Flex>
               <Text className="text-neutral-400">Commits</Text>
-              <Text className="text-neutral-300">{s.commit_count}</Text>
+              <Text className="text-neutral-300 font-mono">{s.commit_count}</Text>
             </Flex>
             <Flex>
               <Text className="text-neutral-400">Files Changed</Text>
-              <Text className="text-neutral-300">{s.files_changed}</Text>
+              <Text className="text-neutral-300 font-mono">{s.files_changed}</Text>
             </Flex>
             <Flex>
               <Text className="text-neutral-400">Tokens Used</Text>

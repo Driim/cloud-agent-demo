@@ -20,7 +20,7 @@ function AdoptionRateCard({ data }: AdoptionRateCardProps) {
         </BadgeDelta>
       </Flex>
       <Text className="mt-2 text-neutral-400">
-        {data.active_30d}/{data.total_members} members active in 30 days
+        <span className="font-mono">{data.active_30d}/{data.total_members}</span> members active in 30 days
       </Text>
     </DashboardCard>
   )

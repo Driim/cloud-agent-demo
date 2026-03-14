@@ -29,7 +29,7 @@ function ChartTooltip({ active, payload, label, valueFormatter }: ChartTooltipEx
   return (
     <div
       data-testid="chart-tooltip"
-      className="rounded-md border border-neutral-700 bg-neutral-900 px-4 py-2.5 text-sm shadow-lg"
+      className="rounded-md border border-white/10 bg-[var(--color-surface)] px-4 py-2.5 text-sm shadow-lg"
     >
       <p className="mb-2 font-medium text-neutral-200">{String(label ?? '')}</p>
       <div className="space-y-1.5">

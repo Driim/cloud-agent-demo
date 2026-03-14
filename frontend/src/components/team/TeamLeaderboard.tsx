@@ -9,6 +9,7 @@ import {
   Title,
 } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import UserAvatar from '../shared/UserAvatar'
 import type { TeamMemberStats } from '../../types/api'
 
 interface TeamLeaderboardProps {
@@ -36,8 +37,13 @@ function TeamLeaderboard({ data }: TeamLeaderboardProps) {
           {sorted.map((member) => (
             <TableRow key={member.user}>
               <TableCell>
-                <span className="font-medium text-white">{member.display_name}</span>
-                <span className="ml-2 text-xs text-neutral-500">{member.user}</span>
+                <div className="flex items-center gap-2">
+                  <UserAvatar name={member.display_name} size="sm" />
+                  <div>
+                    <span className="font-medium text-white">{member.display_name}</span>
+                    <span className="ml-2 text-xs text-neutral-500">{member.user}</span>
+                  </div>
+                </div>
               </TableCell>
               <TableCell><span className="font-mono">{member.sessions}</span></TableCell>
               <TableCell><span className="font-mono">{member.prs_merged}</span></TableCell>

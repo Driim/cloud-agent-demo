@@ -25,7 +25,7 @@ function ConcurrentSessions({ data }: ConcurrentSessionsProps) {
         <Text className="text-neutral-300">{quota.used} active</Text>
         <Text className="text-neutral-400">{quota.limit} max</Text>
       </Flex>
-      <ProgressBar value={pct} color={color} className="mt-2" />
+      <ProgressBar value={pct} color={color} className="mt-2 !ring-0" />
     </DashboardCard>
   )
 }

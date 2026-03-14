@@ -24,7 +24,7 @@ function LatencyP95Chart({ data }: LatencyP95ChartProps) {
         data={chartData}
         index="date"
         categories={['P95 (s)']}
-        colors={['violet']}
+        colors={['orange']}
         valueFormatter={formatLatency}
         yAxisWidth={56}
         showAnimation

@@ -119,7 +119,7 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
             type="button"
             onClick={onPrevPage}
             disabled={!pagination.prev_cursor}
-            className="rounded-lg px-3 py-1 border border-white/10 text-neutral-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
+            className="rounded-lg px-3 py-1.5 border border-white/10 text-neutral-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
           >
             Previous
           </button>
@@ -127,7 +127,7 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
             type="button"
             onClick={onNextPage}
             disabled={!pagination.has_more}
-            className="rounded-lg px-3 py-1 border border-white/10 text-neutral-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
+            className="rounded-lg px-3 py-1.5 border border-white/10 text-neutral-300 disabled:opacity-40 hover:bg-white/5 transition-colors"
           >
             Next
           </button>

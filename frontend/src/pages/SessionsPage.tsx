@@ -45,10 +45,7 @@ function SessionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Title className="text-white">Agent Sessions</Title>
-        <SessionFilters status={status} onStatusChange={(s) => { setStatus(s); setCursor(undefined) }} />
-      </div>
+      <Title className="text-white">Agent Sessions</Title>
 
       {quotas.data && <ConcurrentSessions data={quotas.data} />}
 
@@ -58,6 +55,11 @@ function SessionsPage() {
       </Grid>
 
       {errors.data && <ErrorBreakdown data={errors.data} />}
+
+      <div className="flex items-center justify-between">
+        <Title className="text-white text-base">Sessions List</Title>
+        <SessionFilters status={status} onStatusChange={(s) => { setStatus(s); setCursor(undefined) }} />
+      </div>
 
       <SessionsTable
         data={sessions.data.data}

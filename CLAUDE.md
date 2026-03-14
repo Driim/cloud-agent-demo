@@ -100,6 +100,14 @@ Tailwind v4 can't detect them during content scanning.
 Fix: `frontend/src/tremor-safelist.txt` + `@source "../src/tremor-safelist.txt"` in `index.css`.
 Add new classes here if charts lose color after a Tremor upgrade.
 
+### Chart Color Semantics
+
+- **Session/performance metrics** → `orange` (primary brand color): sessions, duration, latency, repos, tokens
+- **Cost/spend metrics** → `violet` (secondary): spend trend, cost per session, cost breakdown (lead color)
+- **Errors** → `red`: error breakdown
+- **Success** → `emerald`: completed/merged outcomes
+- Multi-series charts (TokenChart, OutcomesDonut) use combination per series meaning
+
 ### Chart Tooltips
 All Tremor charts use `customTooltip={ChartTooltip}` from `src/components/shared/ChartTooltip.tsx`.
 Pass `valueFormatter` prop for custom formatting. Do NOT use default Tremor tooltips — they ignore dark theme.
