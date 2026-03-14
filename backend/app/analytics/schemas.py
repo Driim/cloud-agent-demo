@@ -18,9 +18,11 @@ class OverviewResponse(BaseModel):
     total_sessions: int
     total_tokens: int
     total_spend_usd: float
+    total_spend_delta_pct: float
     total_prs_merged: int
     success_rate: float
     avg_cost_per_pr_usd: float
+    avg_cost_per_pr_delta_pct: float
     top_repos: list[RepoActivity]
 
 

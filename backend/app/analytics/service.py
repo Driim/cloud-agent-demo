@@ -37,9 +37,11 @@ def get_overview() -> OverviewResponse:
         total_sessions=data["total_sessions"],
         total_tokens=data["total_tokens"],
         total_spend_usd=data["total_spend_usd"],
+        total_spend_delta_pct=data["total_spend_delta_pct"],
         total_prs_merged=data["total_prs_merged"],
         success_rate=data["success_rate"],
         avg_cost_per_pr_usd=data["avg_cost_per_pr_usd"],
+        avg_cost_per_pr_delta_pct=data["avg_cost_per_pr_delta_pct"],
         top_repos=[RepoActivity(**r) for r in data["top_repos"]],
     )
 

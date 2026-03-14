@@ -85,9 +85,11 @@ export interface OverviewResponse {
   readonly total_sessions: number
   readonly total_tokens: number
   readonly total_spend_usd: number
+  readonly total_spend_delta_pct: number
   readonly total_prs_merged: number
   readonly success_rate: number
   readonly avg_cost_per_pr_usd: number
+  readonly avg_cost_per_pr_delta_pct: number
   readonly top_repos: readonly RepoActivity[]
 }
 

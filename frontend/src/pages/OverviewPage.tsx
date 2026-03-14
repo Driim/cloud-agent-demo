@@ -1,5 +1,5 @@
 import { Grid, Title } from '@tremor/react'
-import { useOverview, useTokenBreakdown, useSessionOutcomes } from '../api/analytics'
+import { useOverview, useTokenBreakdown, useSessionOutcomes, useTimeseries } from '../api/analytics'
 import OverviewKPIs from '../components/overview/OverviewKPIs'
 import TokenChart from '../components/overview/TokenChart'
 import OutcomesDonut from '../components/overview/OutcomesDonut'
@@ -12,6 +12,7 @@ function OverviewPage() {
   const overview = useOverview()
   const tokenBreakdown = useTokenBreakdown()
   const outcomes = useSessionOutcomes()
+  const sessionsTrend = useTimeseries('sessions', '7d')
 
   if (overview.isLoading || tokenBreakdown.isLoading || outcomes.isLoading) {
     return <LoadingSkeleton lines={6} />
@@ -30,6 +31,7 @@ function OverviewPage() {
           void overview.refetch()
           void tokenBreakdown.refetch()
           void outcomes.refetch()
+          void sessionsTrend.refetch()
         }}
       />
     )
@@ -39,10 +41,12 @@ function OverviewPage() {
     return null
   }
 
+  const trendValues = sessionsTrend.data?.points.map((p) => p.value)
+
   return (
     <div className="space-y-6">
       <Title className="text-white">Overview</Title>
-      <OverviewKPIs data={overview.data} />
+      <OverviewKPIs data={overview.data} sessionsTrend={trendValues} />
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
         <TokenChart data={tokenBreakdown.data} />
         <OutcomesDonut data={outcomes.data} />

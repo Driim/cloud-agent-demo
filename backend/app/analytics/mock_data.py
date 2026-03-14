@@ -24,9 +24,11 @@ OVERVIEW: Final[dict] = {
     "total_sessions": 1_050,
     "total_tokens": 547_500_000,
     "total_spend_usd": 2_580.00,
+    "total_spend_delta_pct": 11.9,  # Feb $2 304 → Mar $2 580 (+11.9% MoM)
     "total_prs_merged": 262,
     "success_rate": 71.0,
     "avg_cost_per_pr_usd": 9.85,
+    "avg_cost_per_pr_delta_pct": -5.2,  # cost per PR improving (-5.2% MoM)
     "top_repos": [
         {"repo": "acme-corp/backend-api", "sessions": 231},
         {"repo": "acme-corp/frontend-app", "sessions": 189},
