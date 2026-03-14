@@ -11,7 +11,7 @@ function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 h-screen w-60 bg-[#0A0A0A] border-r border-white/10 flex flex-col z-10">
       <div className="px-6 py-5 border-b border-white/10">
-        <span className="text-white font-bold text-lg tracking-tight">AgentCloud</span>
+        <span className="text-white font-bold text-lg tracking-tight">ZenCoder Cloud</span>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
         {NAV_ITEMS.map(({ to, label, icon }) => (
