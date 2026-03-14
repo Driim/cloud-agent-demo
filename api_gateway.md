@@ -42,13 +42,15 @@ server {
 
 ### Rate limiting with slowapi
 
-Rate limits are enforced inside FastAPI using `slowapi`, keyed on `org_id` extracted from the JWT. This gives per-tenant quotas without a shared Redis dependency at the gateway level.
+Rate limits are enforced inside FastAPI using `slowapi`, keyed on `org_id` extracted from the JWT. This gives per-tenant quotas.
 
 ```python
 from slowapi import Limiter
-from slowapi.util import get_remote_address
 
-limiter = Limiter(key_func=lambda request: request.state.org_id)
+limiter = Limiter(
+    key_func=lambda request: request.state.org_id,
+    storage_uri="redis://redis:6379",  # required for multi-instance deployments
+)
 
 @app.get("/api/v1/analytics/overview")
 @limiter.limit("60/minute")   # enterprise tier
@@ -63,6 +65,36 @@ Tier-based limits:
 | Free | 10 | 20 |
 | Pro | 60 | 120 |
 | Enterprise | 300 | 600 |
+
+**Important — state storage:**
+
+slowapi stores counters **in-memory by default**. With multiple backend instances each process holds its own counter, so the effective limit becomes `limit × N` (where N = instance count).
+
+- **Single instance**: in-memory is fine (default, no extra infra).
+- **Multiple instances**: `storage_uri` must point to a shared **Redis** instance. slowapi uses the `limits` library under the hood, which supports Redis natively.
+
+```python
+# single instance (default, development)
+limiter = Limiter(key_func=lambda r: r.state.org_id)
+
+# multi-instance (production)
+limiter = Limiter(
+    key_func=lambda r: r.state.org_id,
+    storage_uri="redis://redis:6379",
+)
+```
+
+**Scaling rate limiting further:**
+
+For higher scalability, rate limiting can be moved **above** the application layer entirely:
+
+| Layer | How | Tradeoff |
+| --- | --- | --- |
+| Nginx (`limit_req_zone`) | Per-instance, same problem without Redis | Still needs sticky routing or shared store |
+| Kong / APISIX | Built-in Redis-backed rate limiting plugin | Operational overhead of running a gateway |
+| Cloudflare / AWS WAF | Centralized at edge, no own infra | Vendor lock-in, less flexibility |
+
+The rule: **the problem is not where the limiter runs, but where it stores state**. Any horizontally scaled setup needs a shared external store — Redis is the de-facto standard.
 
 ### JWT validation at the gateway
 
