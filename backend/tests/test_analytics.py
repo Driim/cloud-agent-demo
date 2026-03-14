@@ -88,7 +88,7 @@ class TestAnalyticsService:
         result = service.get_duration_distribution()
         assert len(result) == len(DURATION_DISTRIBUTION)
         total = sum(b.count for b in result)
-        assert total == 80
+        assert total == SESSION_OUTCOMES["total"]
 
     def test_get_adoption_rate(self) -> None:
         result = service.get_adoption_rate()

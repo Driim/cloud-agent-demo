@@ -2,6 +2,12 @@
 
 ~80 sessions with varied statuses, repos, users, and durations.
 All data is deterministic — no random module used.
+
+Values calibrated to industry benchmarks:
+- Tokens/session: 50K–4M, median ~550K (log-normal-like)
+- Cost/session: $0.50–$15, median ~$3.50
+- Duration: 5–75 min, median 25 min
+- Status distribution: completed 55%, merged 25%, failed 12%, timed_out 3%, active 5%
 """
 
 from datetime import datetime, timedelta, timezone
@@ -31,21 +37,44 @@ _USERS: Final[list[str]] = [
     "frank@acme-corp.io",
     "grace@acme-corp.io",
     "hector@acme-corp.io",
+    "igor@acme-corp.io",
+    "kenji@acme-corp.io",
+    "lina@acme-corp.io",
+    "marco@acme-corp.io",
+    "nadia@acme-corp.io",
+    "omar@acme-corp.io",
+    "priya@acme-corp.io",
 ]
 
+# Status distribution (25-element cycle):
+# completed=14 (56%), merged=6 (24%), failed=3 (12%), timed_out=1 (4%), active=1 (4%)
+# Matches benchmark §3.1: completed 55%, merged 25%, failed 12%, timed_out 3%, active 5%
 _STATUSES: Final[list[str]] = [
     "completed",
     "merged",
     "completed",
-    "merged",
+    "completed",
     "failed",
+    "completed",
+    "merged",
+    "completed",
+    "completed",
+    "active",
+    "completed",
     "merged",
     "completed",
     "timed_out",
-    "merged",
     "completed",
     "merged",
     "completed",
+    "failed",
+    "completed",
+    "merged",
+    "completed",
+    "completed",
+    "failed",
+    "completed",
+    "merged",
 ]
 
 _BRANCHES: Final[list[str]] = [
@@ -105,6 +134,33 @@ _TIMEOUT_REASONS: Final[list[str]] = [
     "Session timed out during build step",
 ]
 
+# Token tiers (log-normal-like distribution in thousands):
+# Quick tasks (40%): 80K–180K
+# Typical (46%): 450K–1.5M
+# Extended/marathon (14%): 2M–3.5M
+_TOKEN_TIERS_K: Final[list[int]] = [
+    80,
+    120,
+    550,
+    850,
+    1_200,
+    500,
+    900,
+    150,
+    750,
+    2_500,
+    600,
+    450,
+    1_100,
+    650,
+    95,
+    800,
+    350,
+    1_500,
+    700,
+    3_000,
+]
+
 
 def _build_timeline(
     session_id: str, status: str, started_at: datetime, duration_sec: int, idx: int
@@ -152,6 +208,8 @@ def _build_timeline(
                 "description": reason,
             }
         )
+    elif status == "active":
+        pass  # no end event for active sessions
     else:
         events.append(
             {
@@ -177,10 +235,19 @@ def _generate_sessions() -> list[dict]:
         # Spread sessions over the last 30 days with varied spacing
         hours_offset = i * 9 + (i * 7) % 5
         started_at = _BASE_DT - timedelta(hours=hours_offset, minutes=i * 3)
-        duration_sec = 90 + (i * 47 + 13) % 2400
+
+        # Duration: 300–4500 sec (5–75 min), median ~25 min
+        duration_sec = 300 + (i * 73 + 29) % 4200
         finished_at = started_at + timedelta(seconds=duration_sec)
-        tokens_used = 5_000 + (i * 1_571 + 237) % 85_000
-        cost_usd = round(tokens_used * 0.00005, 2)
+
+        # Tokens: log-normal-like via tier cycling + deterministic offset
+        tokens_used = _TOKEN_TIERS_K[i % len(_TOKEN_TIERS_K)] * 1_000 + (
+            (i * 17_321) % 100_000
+        )
+
+        # Cost: ~$0.006/1K tokens (Sonnet 4.6 blended rate: input $3/M + output $15/M)
+        cost_usd = round(tokens_used * 0.000006, 2)
+
         pr_number = (100 + i) if status in ("merged", "completed") else None
         pr_url = f"https://github.com/{repo}/pull/{pr_number}" if pr_number else None
 

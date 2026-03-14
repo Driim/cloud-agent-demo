@@ -3,6 +3,13 @@
 All time-series data is deterministic (seed-based arithmetic progressions
 with sine-wave variation and day-of-week modulation) — no random module
 is used so values are stable across restarts.
+
+Values calibrated to industry benchmarks (March 2026):
+- Token consumption: 20–35M/day (team), median 550K/session
+- Spend: $180–220/day weekdays, $30–50 weekends (5:1 ratio)
+- Session outcomes: completed 50%, merged 25%, failed 17%, timed_out 8%
+- Cost breakdown: output tokens 52%, compute 22%, input tokens 18%, storage 8%
+- Duration: median 25 min, buckets <10/10–30/30–60/60+ min
 """
 
 import math
@@ -10,27 +17,27 @@ from datetime import date, timedelta
 from typing import Final
 
 # ---------------------------------------------------------------------------
-# KPI overview
+# KPI overview (current month, mid-cycle)
 # ---------------------------------------------------------------------------
 
 OVERVIEW: Final[dict] = {
-    "total_sessions": 2_188,
-    "total_tokens": 84_312_500,
-    "total_spend_usd": 4_215.63,
-    "total_prs_merged": 1_567,
-    "success_rate": 87.4,
-    "avg_cost_per_pr_usd": 2.69,
+    "total_sessions": 1_050,
+    "total_tokens": 547_500_000,
+    "total_spend_usd": 2_580.00,
+    "total_prs_merged": 262,
+    "success_rate": 71.0,
+    "avg_cost_per_pr_usd": 9.85,
     "top_repos": [
-        {"repo": "acme-corp/backend-api", "sessions": 412},
-        {"repo": "acme-corp/frontend-app", "sessions": 348},
-        {"repo": "acme-corp/data-pipeline", "sessions": 287},
-        {"repo": "acme-corp/auth-service", "sessions": 234},
-        {"repo": "acme-corp/ml-models", "sessions": 198},
-        {"repo": "acme-corp/billing-engine", "sessions": 176},
-        {"repo": "acme-corp/infra-terraform", "sessions": 163},
-        {"repo": "acme-corp/mobile-sdk", "sessions": 148},
-        {"repo": "acme-corp/notification-hub", "sessions": 124},
-        {"repo": "acme-corp/docs-site", "sessions": 98},
+        {"repo": "acme-corp/backend-api", "sessions": 231},
+        {"repo": "acme-corp/frontend-app", "sessions": 189},
+        {"repo": "acme-corp/auth-service", "sessions": 147},
+        {"repo": "acme-corp/data-pipeline", "sessions": 105},
+        {"repo": "acme-corp/mobile-sdk", "sessions": 95},
+        {"repo": "acme-corp/ml-models", "sessions": 84},
+        {"repo": "acme-corp/infra-terraform", "sessions": 74},
+        {"repo": "acme-corp/docs-site", "sessions": 52},
+        {"repo": "acme-corp/billing-engine", "sessions": 42},
+        {"repo": "acme-corp/notification-hub", "sessions": 31},
     ],
 }
 
@@ -68,76 +75,77 @@ def _make_series(
 
 TIMESERIES: Final[dict[str, list[dict]]] = {
     "tokens": _make_series(
-        base=537_916, amplitude=80_000, period=14, trend=1200, weekend_dip=0.35
+        base=22_000_000, amplitude=3_500_000, period=14, trend=50_000, weekend_dip=0.80
     ),
     "sessions": _make_series(
-        base=24.3, amplitude=6.0, period=14, trend=0.08, weekend_dip=0.40
+        base=35, amplitude=6.0, period=14, trend=0.08, weekend_dip=0.80
     ),
     "spend": _make_series(
-        base=46.84, amplitude=8.0, period=14, trend=0.15, weekend_dip=0.35
+        base=200, amplitude=25.0, period=14, trend=0.5, weekend_dip=0.80
     ),
     "prs": _make_series(
-        base=17.4, amplitude=4.5, period=14, trend=0.06, weekend_dip=0.45
+        base=8.5, amplitude=2.5, period=14, trend=0.03, weekend_dip=0.85
     ),
     "latency_p95": _make_series(
-        base=380, amplitude=60, period=7, trend=0.5, weekend_dip=0.15
+        base=10_000, amplitude=1_500, period=7, trend=-8, weekend_dip=0.15
     ),
     "cost_per_session": _make_series(
-        base=1.93, amplitude=0.3, period=14, trend=-0.005, weekend_dip=0.0
+        base=3.50, amplitude=0.5, period=14, trend=-0.01, weekend_dip=0.0
     ),
 }
 
 # ---------------------------------------------------------------------------
-# Quotas
+# Quotas (mid-cycle: 55–70% utilisation)
 # ---------------------------------------------------------------------------
 
 QUOTAS: Final[list[dict]] = [
-    {"name": "Sessions", "used": 2_188, "limit": 5_000, "unit": "sessions/month"},
+    {"name": "Sessions", "used": 1_050, "limit": 1_500, "unit": "sessions/month"},
     {
         "name": "Tokens",
-        "used": 84_312_500,
-        "limit": 200_000_000,
+        "used": 547_500_000,
+        "limit": 1_000_000_000,
         "unit": "tokens/month",
     },
-    {"name": "Concurrent agents", "used": 6, "limit": 15, "unit": "agents"},
+    {"name": "Concurrent agents", "used": 4, "limit": 10, "unit": "agents"},
+    {"name": "API calls", "used": 32_500, "limit": 50_000, "unit": "calls/month"},
     {"name": "Storage", "used": 34.7, "limit": 100.0, "unit": "GB"},
-    {"name": "API calls", "used": 12_480, "limit": 50_000, "unit": "calls/month"},
     {"name": "Sandbox hours", "used": 186.5, "limit": 500.0, "unit": "hours/month"},
 ]
 
 # ---------------------------------------------------------------------------
-# Cost breakdown
+# Cost breakdown (output tokens dominate due to 5× price multiplier)
 # ---------------------------------------------------------------------------
 
 COSTS: Final[dict] = {
-    "total_usd": 4_215.63,
+    "total_usd": 2_580.00,
     "breakdown": [
-        {"category": "LLM tokens (input)", "amount_usd": 1_685.42, "percentage": 40.0},
         {
             "category": "LLM tokens (output)",
-            "amount_usd": 1_264.69,
-            "percentage": 30.0,
+            "amount_usd": 1_341.60,
+            "percentage": 52.0,
         },
         {
             "category": "Compute (sandboxes)",
-            "amount_usd": 632.34,
-            "percentage": 15.0,
+            "amount_usd": 567.60,
+            "percentage": 22.0,
         },
-        {"category": "Embedding calls", "amount_usd": 252.94, "percentage": 6.0},
-        {"category": "Storage & egress", "amount_usd": 210.78, "percentage": 5.0},
-        {"category": "Code search index", "amount_usd": 126.47, "percentage": 3.0},
-        {"category": "Other", "amount_usd": 42.99, "percentage": 1.0},
+        {
+            "category": "LLM tokens (input)",
+            "amount_usd": 464.40,
+            "percentage": 18.0,
+        },
+        {"category": "Storage & egress", "amount_usd": 206.40, "percentage": 8.0},
     ],
     "trend": [
-        {"month": "2025-07", "amount_usd": 1_420.30},
-        {"month": "2025-08", "amount_usd": 1_685.10},
-        {"month": "2025-09", "amount_usd": 1_820.50},
-        {"month": "2025-10", "amount_usd": 2_120.10},
-        {"month": "2025-11", "amount_usd": 2_453.45},
-        {"month": "2025-12", "amount_usd": 2_801.88},
-        {"month": "2026-01", "amount_usd": 3_258.72},
-        {"month": "2026-02", "amount_usd": 3_739.19},
-        {"month": "2026-03", "amount_usd": 4_215.63},
+        {"month": "2025-07", "amount_usd": 1_041.00},
+        {"month": "2025-08", "amount_usd": 1_166.00},
+        {"month": "2025-09", "amount_usd": 1_306.00},
+        {"month": "2025-10", "amount_usd": 1_463.00},
+        {"month": "2025-11", "amount_usd": 1_639.00},
+        {"month": "2025-12", "amount_usd": 1_836.00},
+        {"month": "2026-01", "amount_usd": 2_057.00},
+        {"month": "2026-02", "amount_usd": 2_304.00},
+        {"month": "2026-03", "amount_usd": 2_580.00},
     ],
 }
 
@@ -161,28 +169,30 @@ ERRORS: Final[dict] = {
 
 # ---------------------------------------------------------------------------
 # Token breakdown (input / output split for stacked chart)
+# Output:Input = 1:4 → input 80% of volume, output 20%
 # ---------------------------------------------------------------------------
 
 TOKEN_BREAKDOWN: Final[dict[str, list[dict]]] = {
     "token_input": _make_series(
-        base=322_750, amplitude=48_000, period=14, trend=720, weekend_dip=0.35
+        base=17_600_000, amplitude=2_600_000, period=14, trend=40_000, weekend_dip=0.80
     ),
     "token_output": _make_series(
-        base=215_166, amplitude=32_000, period=14, trend=480, weekend_dip=0.35
+        base=4_400_000, amplitude=650_000, period=14, trend=10_000, weekend_dip=0.80
     ),
 }
 
 # ---------------------------------------------------------------------------
 # Session outcomes (completed / merged / failed / timed_out)
+# Benchmark: completed 50%, merged 25%, failed 17%, timed_out 8%
 # ---------------------------------------------------------------------------
 
 SESSION_OUTCOMES: Final[dict] = {
-    "total": 80,
+    "total": 1_050,
     "items": [
-        {"status": "completed", "count": 27, "percentage": 33.75},
-        {"status": "merged", "count": 33, "percentage": 41.25},
-        {"status": "failed", "count": 13, "percentage": 16.25},
-        {"status": "timed_out", "count": 7, "percentage": 8.75},
+        {"status": "completed", "count": 525, "percentage": 50.0},
+        {"status": "merged", "count": 262, "percentage": 25.0},
+        {"status": "failed", "count": 179, "percentage": 17.0},
+        {"status": "timed_out", "count": 84, "percentage": 8.0},
     ],
 }
 
@@ -197,13 +207,14 @@ TOKENS_PER_PR: Final[dict] = {
 
 # ---------------------------------------------------------------------------
 # Duration distribution (session length buckets)
+# Benchmark: <10 min 20%, 10–30 min 40%, 30–60 min 25%, 60+ min 15%
 # ---------------------------------------------------------------------------
 
 DURATION_DISTRIBUTION: Final[list[dict]] = [
-    {"bucket": "< 1 min", "count": 5},
-    {"bucket": "1\u20135 min", "count": 28},
-    {"bucket": "5\u201315 min", "count": 31},
-    {"bucket": "15+ min", "count": 16},
+    {"bucket": "< 10 min", "count": 210},
+    {"bucket": "10\u201330 min", "count": 420},
+    {"bucket": "30\u201360 min", "count": 263},
+    {"bucket": "60+ min", "count": 157},
 ]
 
 # ---------------------------------------------------------------------------
@@ -211,10 +222,10 @@ DURATION_DISTRIBUTION: Final[list[dict]] = [
 # ---------------------------------------------------------------------------
 
 ADOPTION_RATE: Final[dict] = {
-    "rate_7d": 75.0,
+    "rate_7d": 73.0,
     "rate_30d": 100.0,
-    "total_members": 8,
-    "active_7d": 6,
-    "active_30d": 8,
-    "delta_7d_pct": 12.5,
+    "total_members": 15,
+    "active_7d": 11,
+    "active_30d": 15,
+    "delta_7d_pct": 10.0,
 }
