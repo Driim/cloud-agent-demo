@@ -87,6 +87,23 @@ React 18 + Vite + TypeScript (strict mode).
 
 Frontend Vite dev server proxies `/api` requests to backend at `localhost:8000`. No shared code between frontend and backend.
 
+## UI / Theming
+
+### Dark Theme
+- Background: `#0A0A0A`, cards: `bg-neutral-900` with glassmorphism border `border-neutral-800`
+- Fonts: Inter (UI), JetBrains Mono (code/numbers) — loaded via `index.html`
+- Recharts/Tremor dark overrides live in `frontend/src/index.css`
+
+### Tremor v3 + Tailwind CSS v4 — safelist required
+Tremor generates dynamic class names (`fill-blue-500`, `stroke-violet-500`, etc.) at runtime;
+Tailwind v4 can't detect them during content scanning.
+Fix: `frontend/src/tremor-safelist.txt` + `@source "../src/tremor-safelist.txt"` in `index.css`.
+Add new classes here if charts lose color after a Tremor upgrade.
+
+### Chart Tooltips
+All Tremor charts use `customTooltip={ChartTooltip}` from `src/components/shared/ChartTooltip.tsx`.
+Pass `valueFormatter` prop for custom formatting. Do NOT use default Tremor tooltips — they ignore dark theme.
+
 ## Code Style
 
 - **Backend linting**: flake8 (max-line-length=120, max-complexity=15), black, isort (google style)

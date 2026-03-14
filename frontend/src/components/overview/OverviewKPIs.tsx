@@ -1,4 +1,3 @@
-import { Grid } from '@tremor/react'
 import KPICard from '../shared/KPICard'
 import type { OverviewResponse } from '../../types/api'
 
@@ -18,7 +17,7 @@ interface OverviewKPIsProps {
 
 function OverviewKPIs({ data }: OverviewKPIsProps) {
   return (
-    <Grid numItemsSm={2} numItemsLg={2} className="gap-6">
+    <div className="grid grid-cols-2 gap-6">
       <KPICard
         title="Total Sessions"
         value={formatNumber(data.total_sessions)}
@@ -37,11 +36,13 @@ function OverviewKPIs({ data }: OverviewKPIsProps) {
         title="Cost per Merged PR"
         value={formatUSD(data.avg_cost_per_pr_usd)}
       />
-      <KPICard
-        title="Total Spend"
-        value={formatUSD(data.total_spend_usd)}
-      />
-    </Grid>
+      <div className="col-span-2">
+        <KPICard
+          title="Total Spend"
+          value={formatUSD(data.total_spend_usd)}
+        />
+      </div>
+    </div>
   )
 }
 

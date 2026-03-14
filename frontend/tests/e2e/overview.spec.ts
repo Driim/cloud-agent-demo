@@ -94,6 +94,52 @@ test.describe('Overview page', () => {
     expect(rowCount).toBeGreaterThan(0)
   })
 
+  test('KPI cards are arranged in 2-column grid: first 4 in 2x2, Total Spend full-width', async ({ page }) => {
+    const overview = new OverviewPage(page)
+    await overview.goto()
+
+    const getCardBox = async (title: string) => {
+      const card = overview.main
+        .locator('p, span')
+        .filter({ hasText: new RegExp(`^${title}$`) })
+        .first()
+      await expect(card).toBeVisible()
+      return card.boundingBox()
+    }
+
+    const [totalSessions, tokenConsumption, prsMerged, costPerPR, totalSpend] = await Promise.all([
+      getCardBox('Total Sessions'),
+      getCardBox('Token Consumption'),
+      getCardBox('PRs Merged'),
+      getCardBox('Cost per Merged PR'),
+      getCardBox('Total Spend'),
+    ])
+
+    expect(totalSessions).not.toBeNull()
+    expect(tokenConsumption).not.toBeNull()
+    expect(prsMerged).not.toBeNull()
+    expect(costPerPR).not.toBeNull()
+    expect(totalSpend).not.toBeNull()
+
+    // Row 1: Total Sessions and Token Consumption are on the same vertical position
+    expect(Math.abs(totalSessions!.y - tokenConsumption!.y)).toBeLessThan(5)
+
+    // Row 2: PRs Merged and Cost per Merged PR are on the same vertical position
+    expect(Math.abs(prsMerged!.y - costPerPR!.y)).toBeLessThan(5)
+
+    // Columns: Total Sessions and PRs Merged are in the left column (same x)
+    expect(Math.abs(totalSessions!.x - prsMerged!.x)).toBeLessThan(5)
+
+    // Columns: Token Consumption and Cost per Merged PR are in the right column (same x)
+    expect(Math.abs(tokenConsumption!.x - costPerPR!.x)).toBeLessThan(5)
+
+    // Total Spend is in its own full-width row below the 2x2
+    expect(totalSpend!.y).toBeGreaterThan(prsMerged!.y)
+
+    // Total Spend starts at (or near) the left edge of the grid (col-span-2)
+    expect(Math.abs(totalSpend!.x - totalSessions!.x)).toBeLessThan(5)
+  })
+
   test('shows error when API fails', async ({ page }) => {
     await page.route('**/api/v1/analytics/overview', (route) =>
       route.fulfill({ status: 500, body: 'Server error' }),

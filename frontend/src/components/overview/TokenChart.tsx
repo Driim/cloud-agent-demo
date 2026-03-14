@@ -26,7 +26,7 @@ function TokenChart({ data }: TokenChartProps) {
         colors={['blue', 'violet']}
         stack
         valueFormatter={(n: number) =>
-          n >= 1_000 ? `${(n / 1_000).toFixed(1)}k` : n.toString()
+          n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `${(n / 1_000).toFixed(0)}k` : n.toString()
         }
         yAxisWidth={56}
         showAnimation
@@ -34,7 +34,7 @@ function TokenChart({ data }: TokenChartProps) {
           <ChartTooltip
             {...props}
             valueFormatter={(n: number) =>
-              n >= 1_000 ? `${(n / 1_000).toFixed(1)}k` : n.toString()
+              n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `${(n / 1_000).toFixed(0)}k` : n.toString()
             }
           />
         )}
