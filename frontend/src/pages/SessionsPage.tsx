@@ -70,8 +70,8 @@ function SessionsPage() {
           }
         }}
         onPrevPage={() => {
-          if (sessions.data.pagination.prev_cursor) {
-            setCursor(sessions.data.pagination.prev_cursor)
+          if (sessions.data.pagination.prev_cursor != null) {
+            setCursor(sessions.data.pagination.prev_cursor || undefined)
           }
         }}
       />

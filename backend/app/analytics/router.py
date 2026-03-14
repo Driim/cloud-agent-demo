@@ -53,7 +53,9 @@ async def get_overview(
 @router.get("/timeseries/{metric}", response_model=TimeSeriesResponse)
 async def get_timeseries(
     metric: str,
-    range_: str = Query(default="30d", alias="range", description="Time range: 7d | 30d | 90d"),
+    range_: str = Query(
+        default="30d", alias="range", description="Time range: 7d | 30d | 90d"
+    ),
     granularity: str = Query(default="day", description="Granularity: hour | day"),
     _: UserProfile = Depends(get_current_user),
 ) -> TimeSeriesResponse:
@@ -94,7 +96,9 @@ async def get_errors(
 
 @router.get("/token-breakdown", response_model=MultiSeriesResponse)
 async def get_token_breakdown(
-    range_: str = Query(default="30d", alias="range", description="Time range: 7d | 30d | 90d"),
+    range_: str = Query(
+        default="30d", alias="range", description="Time range: 7d | 30d | 90d"
+    ),
     granularity: str = Query(default="day", description="Granularity: hour | day"),
     _: UserProfile = Depends(get_current_user),
 ) -> MultiSeriesResponse:

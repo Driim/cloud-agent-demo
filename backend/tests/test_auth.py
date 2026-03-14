@@ -80,9 +80,7 @@ class TestPostToken:
         assert resp.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_missing_fields_returns_422(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_missing_fields_returns_422(self, client: AsyncClient) -> None:
         resp = await client.post("/api/v1/auth/token", json={})
         assert resp.status_code == 422
 
@@ -104,9 +102,7 @@ class TestPostRefresh:
         assert body["refresh_token"] == MOCK_REFRESH_TOKEN
 
     @pytest.mark.asyncio
-    async def test_returns_401_with_invalid_refresh(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_returns_401_with_invalid_refresh(self, client: AsyncClient) -> None:
         resp = await client.post(
             "/api/v1/auth/refresh",
             json={"refresh_token": "invalid.token"},

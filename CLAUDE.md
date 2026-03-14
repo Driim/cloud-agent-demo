@@ -47,7 +47,7 @@ FastAPI app with modular domain structure. Each module has `router.py`, `service
 - **Entry**: `app/main.py` — mounts routers, CORS middleware
 - **Config**: `app/config.py` — pydantic-settings, env-based
 - **Auth**: `app/auth/` — mock bearer token auth via `dependencies.py` (`get_current_user`)
-- **Modules**: `sessions/`, `analytics/`, `team/`, `repositories/` — each self-contained
+- **Modules**: `sessions/`, `analytics/`, `team/`, `repositories/` — each self-contained (`repositories/` has no `mock_data.py` — data is hardcoded in `service.py`)
 - **All routes** prefixed `/api/v1`
 - **Tests**: `tests/` — pytest-asyncio, AsyncClient fixture in `conftest.py`
 
@@ -112,6 +112,14 @@ Add new classes here if charts lose color after a Tremor upgrade.
 All Tremor charts use `customTooltip={ChartTooltip}` from `src/components/shared/ChartTooltip.tsx`.
 Pass `valueFormatter` prop for custom formatting. Do NOT use default Tremor tooltips — they ignore dark theme.
 
+## Environment
+
+Backend reads `.env` from `backend/` (optional, all settings have defaults). No required env vars — runs out of the box.
+
+**Mock auth credentials** (for manual API testing):
+- Email: `admin@acme-corp.io`, Password: `mock-password`
+- Bearer token (shortcut): `Authorization: Bearer mock.access.token`
+
 ## Code Style
 
 - **Backend linting**: flake8 (max-line-length=120, max-complexity=15), black, isort (google style)
@@ -119,9 +127,18 @@ Pass `valueFormatter` prop for custom formatting. Do NOT use default Tremor tool
 - **TypeScript**: strict mode, no unused locals/parameters
 - **Python**: >=3.11, type hints via pydantic models
 
+## Gotchas
+
+### FastAPI
+
+- `status.HTTP_422_UNPROCESSABLE_ENTITY` is deprecated — use `HTTP_422_UNPROCESSABLE_CONTENT` instead.
+- Query params named `range` shadow Python built-in — use `range_` with `Query(alias="range")`.
+
+### Testing Library + Tremor
+Tremor renders numeric values in separate `<span>` nodes. `getByText('15/15 members active')` will fail.
+Use regex for text with embedded numbers: `getByText(/members active/)` + separate `getByText('15/15')`.
+
 ## Current Status
 
-- Backend: all 5 modules implemented with mock data and tests (~80% coverage)
-- Frontend: fully implemented — pages, API layer, components, unit + E2E tests
 - No database integration yet (design docs in `clickhouse.md`, `system_design.md`)
 - No Docker or CI/CD configuration
