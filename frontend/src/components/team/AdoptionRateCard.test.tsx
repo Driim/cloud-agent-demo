@@ -21,7 +21,8 @@ describe('AdoptionRateCard', () => {
 
   it('renders 30-day member count', () => {
     render(<AdoptionRateCard data={mockData} />)
-    expect(screen.getByText('15/15 members active in 30 days')).toBeInTheDocument()
+    expect(screen.getByText(/members active in 30 days/)).toBeInTheDocument()
+    expect(screen.getByText('15/15')).toBeInTheDocument()
   })
 
   it('renders the delta badge', () => {
