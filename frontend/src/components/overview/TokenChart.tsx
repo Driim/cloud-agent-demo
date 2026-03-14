@@ -1,5 +1,6 @@
 import { Title, AreaChart } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import ChartTooltip from '../shared/ChartTooltip'
 import type { MultiSeriesResponse } from '../../types/api'
 import { formatChartDate } from '../../utils/format'
 
@@ -29,6 +30,14 @@ function TokenChart({ data }: TokenChartProps) {
         }
         yAxisWidth={56}
         showAnimation
+        customTooltip={(props) => (
+          <ChartTooltip
+            {...props}
+            valueFormatter={(n: number) =>
+              n >= 1_000 ? `${(n / 1_000).toFixed(1)}k` : n.toString()
+            }
+          />
+        )}
       />
     </DashboardCard>
   )

@@ -1,5 +1,6 @@
 import { BarChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import ChartTooltip from '../shared/ChartTooltip'
 import type { DurationBucket } from '../../types/api'
 
 interface DurationDistributionProps {
@@ -24,6 +25,9 @@ function DurationDistribution({ data }: DurationDistributionProps) {
         valueFormatter={(n: number) => n.toString()}
         yAxisWidth={40}
         showAnimation
+        customTooltip={(props) => (
+          <ChartTooltip {...props} valueFormatter={(n: number) => n.toString()} />
+        )}
       />
     </DashboardCard>
   )

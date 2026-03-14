@@ -4,16 +4,16 @@ import ConcurrentSessions from './ConcurrentSessions'
 import type { QuotaItem } from '../../types/api'
 
 const mockQuotas: readonly QuotaItem[] = [
-  { name: 'Sessions', used: 2188, limit: 5000, unit: 'sessions/month' },
-  { name: 'Concurrent agents', used: 6, limit: 15, unit: 'agents' },
+  { name: 'Sessions', used: 1050, limit: 1500, unit: 'sessions/month' },
+  { name: 'Concurrent agents', used: 4, limit: 10, unit: 'agents' },
 ]
 
 describe('ConcurrentSessions', () => {
   it('renders title and quota values', () => {
     render(<ConcurrentSessions data={mockQuotas} />)
     expect(screen.getByText('Concurrent Sessions')).toBeInTheDocument()
-    expect(screen.getByText('6 active')).toBeInTheDocument()
-    expect(screen.getByText('15 max')).toBeInTheDocument()
+    expect(screen.getByText('4 active')).toBeInTheDocument()
+    expect(screen.getByText('10 max')).toBeInTheDocument()
   })
 
   it('renders nothing when quota is missing', () => {

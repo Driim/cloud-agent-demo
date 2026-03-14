@@ -1,5 +1,6 @@
 import { BarChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import ChartTooltip from '../shared/ChartTooltip'
 import type { RepoActivity } from '../../types/api'
 
 interface TopReposBarProps {
@@ -24,6 +25,7 @@ function TopReposBar({ data }: TopReposBarProps) {
         layout="vertical"
         yAxisWidth={100}
         showAnimation
+        customTooltip={(props) => <ChartTooltip {...props} />}
       />
     </DashboardCard>
   )

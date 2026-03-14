@@ -8,8 +8,8 @@ const mockData: TimeSeriesResponse = {
   range: '30d',
   granularity: 'day',
   points: [
-    { timestamp: '2026-03-10', value: 380 },
-    { timestamp: '2026-03-11', value: 420 },
+    { timestamp: '2026-03-10', value: 9_500 },
+    { timestamp: '2026-03-11', value: 10_200 },
   ],
 }
 

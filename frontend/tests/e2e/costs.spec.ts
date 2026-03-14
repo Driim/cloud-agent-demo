@@ -53,6 +53,37 @@ test.describe('Costs page', () => {
     expect(quotasBox!.y).toBeGreaterThan(tokensBox!.y)
   })
 
+  test('spend chart tooltip has opaque background and proper spacing', async ({ page }) => {
+    const costs = new CostsPage(page)
+    await costs.goto()
+
+    const main = page.locator('main')
+    // Find the first Recharts LineChart (Daily Spend Trend)
+    const rechartsWrapper = main.locator('.recharts-responsive-container').first()
+    await rechartsWrapper.scrollIntoViewIfNeeded()
+    await expect(rechartsWrapper).toBeVisible({ timeout: 10000 })
+
+    const box = await rechartsWrapper.boundingBox()
+    expect(box).not.toBeNull()
+    await page.mouse.move(box!.x + box!.width * 0.5, box!.y + box!.height * 0.4)
+
+    const tooltip = page.locator('[data-testid="chart-tooltip"]')
+    await expect(tooltip).toBeVisible({ timeout: 5000 })
+
+    // Verify opaque background
+    const bg = await tooltip.evaluate((el) => getComputedStyle(el).backgroundColor)
+    expect(bg).not.toBe('rgba(0, 0, 0, 0)')
+    expect(bg).not.toBe('transparent')
+
+    // Verify proper spacing and formatted value with $
+    const rows = tooltip.locator('.flex.items-center.justify-between')
+    const rowCount = await rows.count()
+    expect(rowCount).toBeGreaterThan(0)
+
+    const valueText = await rows.first().locator('.tabular-nums').textContent()
+    expect(valueText).toMatch(/^\$/)
+  })
+
   test('shows error when API fails', async ({ page }) => {
     await page.route('**/api/v1/analytics/costs', (route) =>
       route.fulfill({ status: 500, body: 'Internal server error' }),

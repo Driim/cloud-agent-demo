@@ -4,7 +4,6 @@ import OverviewKPIs from '../components/overview/OverviewKPIs'
 import TokenChart from '../components/overview/TokenChart'
 import OutcomesDonut from '../components/overview/OutcomesDonut'
 import TopReposBar from '../components/overview/TopReposBar'
-import CostPerPRCard from '../components/overview/CostPerPRCard'
 import LoadingSkeleton from '../components/shared/LoadingSkeleton'
 import ErrorState from '../components/shared/ErrorState'
 import { sanitizeApiError } from '../utils/errors'
@@ -49,7 +48,6 @@ function OverviewPage() {
         <OutcomesDonut data={outcomes.data} />
       </Grid>
       <TopReposBar data={overview.data.top_repos} />
-      <CostPerPRCard avgCostPerPr={overview.data.avg_cost_per_pr_usd} />
     </div>
   )
 }

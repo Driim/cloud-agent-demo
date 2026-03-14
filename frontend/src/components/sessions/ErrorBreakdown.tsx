@@ -1,5 +1,6 @@
 import { BarChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import ChartTooltip from '../shared/ChartTooltip'
 import type { ErrorDistributionResponse } from '../../types/api'
 
 interface ErrorBreakdownProps {
@@ -23,6 +24,7 @@ function ErrorBreakdown({ data }: ErrorBreakdownProps) {
         colors={['red']}
         yAxisWidth={40}
         showAnimation
+        customTooltip={(props) => <ChartTooltip {...props} />}
       />
     </DashboardCard>
   )

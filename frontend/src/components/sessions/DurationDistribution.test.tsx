@@ -4,10 +4,10 @@ import DurationDistribution from './DurationDistribution'
 import type { DurationBucket } from '../../types/api'
 
 const mockData: readonly DurationBucket[] = [
-  { bucket: '< 1 min', count: 5 },
-  { bucket: '1–5 min', count: 28 },
-  { bucket: '5–15 min', count: 31 },
-  { bucket: '15+ min', count: 16 },
+  { bucket: '< 10 min', count: 210 },
+  { bucket: '10–30 min', count: 420 },
+  { bucket: '30–60 min', count: 263 },
+  { bucket: '60+ min', count: 157 },
 ]
 
 describe('DurationDistribution', () => {

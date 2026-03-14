@@ -1,5 +1,6 @@
 import { BarChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import ChartTooltip from '../shared/ChartTooltip'
 import type { TeamMemberStats } from '../../types/api'
 
 interface SessionsPerMemberProps {
@@ -23,6 +24,7 @@ function SessionsPerMember({ data }: SessionsPerMemberProps) {
         colors={['blue']}
         yAxisWidth={40}
         showAnimation
+        customTooltip={(props) => <ChartTooltip {...props} />}
       />
     </DashboardCard>
   )

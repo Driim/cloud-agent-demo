@@ -1,5 +1,6 @@
 import { DonutChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import ChartTooltip from '../shared/ChartTooltip'
 import type { SessionOutcomesResponse } from '../../types/api'
 
 interface OutcomesDonutProps {
@@ -30,6 +31,9 @@ function OutcomesDonut({ data }: OutcomesDonutProps) {
         colors={['emerald', 'blue', 'red', 'amber']}
         valueFormatter={(n: number) => n.toString()}
         showAnimation
+        customTooltip={(props) => (
+          <ChartTooltip {...props} valueFormatter={(n: number) => n.toString()} />
+        )}
       />
     </DashboardCard>
   )

@@ -1,5 +1,6 @@
 import { LineChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
+import ChartTooltip from '../shared/ChartTooltip'
 import type { TimeSeriesResponse } from '../../types/api'
 import { formatChartDate } from '../../utils/format'
 
@@ -25,6 +26,9 @@ function SpendTrend({ data }: SpendTrendProps) {
         valueFormatter={(n: number) => `$${n.toFixed(2)}`}
         yAxisWidth={56}
         showAnimation
+        customTooltip={(props) => (
+          <ChartTooltip {...props} valueFormatter={(n: number) => `$${n.toFixed(2)}`} />
+        )}
       />
     </DashboardCard>
   )
