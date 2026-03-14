@@ -18,6 +18,7 @@ const colorMap: Record<string, string> = {
   orange: 'bg-orange-500',
   pink: 'bg-pink-500',
   teal: 'bg-teal-500',
+  sky: 'bg-sky-500',
 }
 
 function ChartTooltip({ active, payload, label, valueFormatter }: ChartTooltipExtendedProps) {

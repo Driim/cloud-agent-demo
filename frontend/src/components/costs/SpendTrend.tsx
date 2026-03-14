@@ -22,7 +22,7 @@ function SpendTrend({ data }: SpendTrendProps) {
         data={chartData}
         index="date"
         categories={['Spend']}
-        colors={['blue']}
+        colors={['orange']}
         valueFormatter={(n: number) => `$${n.toFixed(2)}`}
         yAxisWidth={56}
         showAnimation

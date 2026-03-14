@@ -16,7 +16,7 @@ function SessionTimeline({ events }: SessionTimelineProps) {
           return (
             <div key={`${event.timestamp}-${event.event_type}`} className="flex gap-3">
               <div className="flex flex-col items-center">
-                <div className="h-2.5 w-2.5 rounded-full bg-ai-blue mt-1.5" />
+                <div className="h-2.5 w-2.5 rounded-full bg-ai-orange mt-1.5" />
                 {i < events.length - 1 && (
                   <div className="w-px flex-1 bg-white/10" />
                 )}

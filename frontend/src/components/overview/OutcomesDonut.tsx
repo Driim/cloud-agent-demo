@@ -28,7 +28,7 @@ function OutcomesDonut({ data }: OutcomesDonutProps) {
         data={chartData}
         category="value"
         index="name"
-        colors={['emerald', 'blue', 'red', 'amber']}
+        colors={['orange', 'emerald', 'red', 'violet']}
         valueFormatter={(n: number) => n.toString()}
         showAnimation
         customTooltip={(props) => (

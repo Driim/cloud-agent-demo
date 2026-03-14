@@ -23,7 +23,7 @@ function Sidebar() {
               [
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-ai-blue/15 text-ai-blue'
+                  ? 'bg-ai-orange/15 text-ai-orange'
                   : 'text-neutral-400 hover:bg-white/5 hover:text-white',
               ].join(' ')
             }

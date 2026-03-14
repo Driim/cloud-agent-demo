@@ -55,7 +55,7 @@ function SessionDetailPage() {
       <div className="flex items-center gap-3">
         <Link
           to="/sessions"
-          className="text-sm text-ai-blue hover:text-blue-400"
+          className="text-sm text-ai-orange hover:text-orange-400"
         >
           &larr; Back
         </Link>
@@ -109,7 +109,7 @@ function SessionDetailPage() {
                   href={s.pr_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ai-blue hover:underline"
+                  className="text-ai-orange hover:underline"
                 >
                   #{s.pr_number}
                 </a>

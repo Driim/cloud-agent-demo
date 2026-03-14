@@ -9,13 +9,13 @@ interface QuotasListProps {
 type QuotaStatus = 'Normal' | 'Warning' | 'Critical'
 
 const FILL_COLOR: Record<QuotaStatus, string> = {
-  Normal: '#3b82f6',
+  Normal: '#f97316',
   Warning: '#f59e0b',
   Critical: '#ef4444',
 }
 
-const BADGE_COLOR: Record<QuotaStatus, 'blue' | 'amber' | 'red'> = {
-  Normal: 'blue',
+const BADGE_COLOR: Record<QuotaStatus, 'orange' | 'amber' | 'red'> = {
+  Normal: 'orange',
   Warning: 'amber',
   Critical: 'red',
 }

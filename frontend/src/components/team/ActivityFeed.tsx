@@ -5,7 +5,7 @@ import { BASE_URL, getAuthToken } from '../../api/client'
 import type { ActivityEvent } from '../../types/api'
 
 const EVENT_COLORS: Record<string, string> = {
-  session_started: 'blue',
+  session_started: 'orange',
   session_completed: 'green',
   pr_merged: 'emerald',
   session_failed: 'red',

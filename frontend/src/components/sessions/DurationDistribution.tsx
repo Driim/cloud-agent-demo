@@ -21,7 +21,7 @@ function DurationDistribution({ data }: DurationDistributionProps) {
         data={chartData}
         index="bucket"
         categories={['Sessions']}
-        colors={['blue']}
+        colors={['orange']}
         valueFormatter={(n: number) => n.toString()}
         yAxisWidth={40}
         showAnimation

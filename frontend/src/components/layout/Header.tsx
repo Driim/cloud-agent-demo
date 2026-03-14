@@ -12,7 +12,7 @@ function Header() {
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-ai-purple/15 text-ai-purple">
           {USER_ROLE}
         </span>
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ai-blue to-ai-purple flex items-center justify-center text-white text-sm font-medium">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ai-orange to-ai-purple flex items-center justify-center text-white text-sm font-medium">
           {USER_EMAIL[0].toUpperCase()}
         </div>
       </div>

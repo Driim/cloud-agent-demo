@@ -8,7 +8,7 @@
   --color-surface: #121212;
   --color-surface-hover: #1A1A1A;
 
-  --color-ai-blue: #3B82F6;
+  --color-ai-orange: #F97316;
   --color-ai-purple: #8B5CF6;
 
   /* Tremor dark theme tokens (required by Tremor v3 tooltip/chart internals) */
@@ -122,23 +122,6 @@
   background-color: rgba(255, 255, 255, 0.02) !important;
 }
 
-/* Tremor Select dark override */
-[class*="tremor-Select"] button,
-[class*="tremor-Select"] [role="listbox"] {
-  background-color: #121212 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #d4d4d4 !important;
-}
-
-[class*="tremor-SelectItem"] {
-  color: #d4d4d4 !important;
-}
-
-[class*="tremor-SelectItem"]:hover,
-[class*="tremor-SelectItem"][data-headlessui-state~="active"] {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-}
-
 
 /* Donut chart center label */
 .recharts-text.recharts-label,
@@ -163,9 +146,9 @@ svg text.recharts-text[text-anchor="middle"] {
   background-color: rgba(5, 150, 105, 0.4) !important; /* emerald-600 at 40% */
 }
 
-.dark [class*="tremor-Badge"][class*="bg-blue"],
-.dark [class*="tremor-BadgeDelta"][class*="bg-blue"] {
-  background-color: rgba(37, 99, 235, 0.4) !important; /* blue-600 at 40% */
+.dark [class*="tremor-Badge"][class*="bg-orange"],
+.dark [class*="tremor-BadgeDelta"][class*="bg-orange"] {
+  background-color: rgba(234, 88, 12, 0.4) !important; /* orange-600 at 40% */
 }
 
 .dark [class*="tremor-Badge"][class*="bg-red"],
@@ -180,13 +163,13 @@ svg text.recharts-text[text-anchor="middle"] {
 
 /* --- Darker chart fills/strokes for dark theme --- */
 /* Shift Tremor chart colors from -500 to -700 for a muted dark-friendly palette */
-.dark [class*="fill-blue-500"]    { fill: #1d4ed8 !important; }     /* blue-700 */
+.dark [class*="fill-orange-500"]  { fill: #c2410c !important; }     /* orange-700 */
 .dark [class*="fill-violet-500"]  { fill: #6d28d9 !important; }     /* violet-700 */
 .dark [class*="fill-emerald-500"] { fill: #047857 !important; }     /* emerald-700 */
 .dark [class*="fill-red-500"]     { fill: #b91c1c !important; }     /* red-700 */
 .dark [class*="fill-amber-500"]   { fill: #b45309 !important; }     /* amber-700 */
 
-.dark [class*="stroke-blue-500"]    { stroke: #1d4ed8 !important; } /* blue-700 */
+.dark [class*="stroke-orange-500"]  { stroke: #c2410c !important; } /* orange-700 */
 .dark [class*="stroke-violet-500"]  { stroke: #6d28d9 !important; } /* violet-700 */
 .dark [class*="stroke-emerald-500"] { stroke: #047857 !important; } /* emerald-700 */
 .dark [class*="stroke-red-500"]     { stroke: #b91c1c !important; } /* red-700 */

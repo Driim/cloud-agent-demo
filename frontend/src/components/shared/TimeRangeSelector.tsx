@@ -22,7 +22,7 @@ function TimeRangeSelector({ value, onChange }: TimeRangeSelectorProps) {
           className={[
             'px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg',
             value === rangeValue
-              ? 'bg-ai-blue text-white'
+              ? 'bg-ai-orange text-white'
               : 'text-neutral-400 hover:bg-white/5 hover:text-white',
           ].join(' ')}
         >

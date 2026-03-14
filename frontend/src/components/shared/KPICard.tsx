@@ -31,7 +31,7 @@ function KPICard({ title, value, delta, deltaType, trendData }: KPICardProps) {
             data={sparkData}
             categories={['v']}
             index="i"
-            colors={['blue']}
+            colors={['orange']}
             className="h-10 w-24 shrink-0"
           />
         )}

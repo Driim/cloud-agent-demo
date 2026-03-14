@@ -21,7 +21,7 @@ function SessionsPerMember({ data }: SessionsPerMemberProps) {
         data={chartData}
         index="name"
         categories={['Sessions']}
-        colors={['blue']}
+        colors={['orange']}
         yAxisWidth={40}
         showAnimation
         customTooltip={(props) => <ChartTooltip {...props} />}

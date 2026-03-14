@@ -21,7 +21,7 @@ function TopReposBar({ data }: TopReposBarProps) {
         data={chartData}
         index="repo"
         categories={['Sessions']}
-        colors={['blue']}
+        colors={['orange']}
         layout="vertical"
         yAxisWidth={100}
         showAnimation

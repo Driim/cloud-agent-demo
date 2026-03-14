@@ -21,7 +21,7 @@ function CostBreakdownDonut({ data }: CostBreakdownDonutProps) {
         data={chartData}
         category="value"
         index="name"
-        colors={['blue', 'violet', 'amber', 'emerald']}
+        colors={['orange', 'violet', 'sky', 'emerald']}
         valueFormatter={(n: number) => `$${n.toFixed(2)}`}
         showAnimation
         customTooltip={(props) => (

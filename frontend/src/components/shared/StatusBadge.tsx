@@ -2,7 +2,7 @@ import { Badge } from '@tremor/react'
 import type { SessionStatus } from '../../types/api'
 
 const STATUS_CONFIG: Record<SessionStatus, { color: string; label: string }> = {
-  completed: { color: 'blue', label: 'Completed' },
+  completed: { color: 'orange', label: 'Completed' },
   merged: { color: 'green', label: 'Merged' },
   failed: { color: 'red', label: 'Failed' },
   timed_out: { color: 'amber', label: 'Timed Out' },
