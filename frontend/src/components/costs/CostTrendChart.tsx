@@ -2,7 +2,7 @@ import { LineChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
 import ChartTooltip from '../shared/ChartTooltip'
 import type { TimeSeriesResponse } from '../../types/api'
-import { formatChartDate } from '../../utils/format'
+import { formatChartDate, formatUSD } from '../../utils/format'
 
 interface CostTrendChartProps {
   readonly data: TimeSeriesResponse
@@ -23,11 +23,11 @@ function CostTrendChart({ data }: CostTrendChartProps) {
         index="date"
         categories={['Cost per Session']}
         colors={['violet']}
-        valueFormatter={(n: number) => `$${n.toFixed(2)}`}
+        valueFormatter={formatUSD}
         yAxisWidth={56}
         showAnimation
         customTooltip={(props) => (
-          <ChartTooltip {...props} valueFormatter={(n: number) => `$${n.toFixed(2)}`} />
+          <ChartTooltip {...props} valueFormatter={formatUSD} />
         )}
       />
     </DashboardCard>

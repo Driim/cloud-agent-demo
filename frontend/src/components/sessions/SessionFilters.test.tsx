@@ -21,7 +21,7 @@ describe('SessionFilters', () => {
     await user.click(screen.getByRole('combobox'))
 
     expect(screen.getByRole('listbox')).toBeInTheDocument()
-    expect(screen.getAllByRole('option')).toHaveLength(5)
+    expect(screen.getAllByRole('option')).toHaveLength(6)
   })
 
   it('calls onStatusChange with status value when option clicked', async () => {
@@ -46,12 +46,13 @@ describe('SessionFilters', () => {
     expect(onChange).toHaveBeenCalledWith(undefined)
   })
 
-  it('renders all four status options with labels', async () => {
+  it('renders all five status options with labels', async () => {
     const user = userEvent.setup()
     render(<SessionFilters status={undefined} onStatusChange={vi.fn()} />)
 
     await user.click(screen.getByRole('combobox'))
 
+    expect(screen.getByRole('option', { name: /Active/ })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: /Completed/ })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: /Merged/ })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: /Failed/ })).toBeInTheDocument()

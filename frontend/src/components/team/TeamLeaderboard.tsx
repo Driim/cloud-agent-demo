@@ -11,6 +11,7 @@ import {
 import DashboardCard from '../shared/DashboardCard'
 import UserAvatar from '../shared/UserAvatar'
 import type { TeamMemberStats } from '../../types/api'
+import { formatUSD } from '../../utils/format'
 
 interface TeamLeaderboardProps {
   readonly data: readonly TeamMemberStats[]
@@ -56,7 +57,7 @@ function TeamLeaderboard({ data }: TeamLeaderboardProps) {
                 </Badge>
               </TableCell>
               <TableCell><span className="font-mono">{Math.round(member.avg_session_duration_sec / 60)}m</span></TableCell>
-              <TableCell><span className="font-mono">${member.total_cost_usd.toFixed(2)}</span></TableCell>
+              <TableCell><span className="font-mono">{formatUSD(member.total_cost_usd)}</span></TableCell>
             </TableRow>
           ))}
         </TableBody>

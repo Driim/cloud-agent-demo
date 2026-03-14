@@ -6,7 +6,7 @@ import StatusBadge from '../components/shared/StatusBadge'
 import SessionTimeline from '../components/sessions/SessionTimeline'
 import LoadingSkeleton from '../components/shared/LoadingSkeleton'
 import ErrorState from '../components/shared/ErrorState'
-import { formatDuration } from '../utils/format'
+import { formatDuration, formatUSD } from '../utils/format'
 import { sanitizeApiError } from '../utils/errors'
 
 const ALLOWED_PR_HOSTNAMES = ['github.com', 'gitlab.com', 'bitbucket.org']
@@ -78,7 +78,7 @@ function SessionDetailPage() {
         </DashboardCard>
         <DashboardCard>
           <Text className="text-neutral-400">Cost</Text>
-          <Metric className="text-lg text-white font-mono">${s.cost_usd.toFixed(2)}</Metric>
+          <Metric className="text-lg text-white font-mono">{formatUSD(s.cost_usd)}</Metric>
         </DashboardCard>
       </Grid>
 
@@ -119,10 +119,12 @@ function SessionDetailPage() {
               <Text className="text-neutral-400">Started</Text>
               <Text className="text-neutral-300">{new Date(s.started_at).toLocaleString()}</Text>
             </Flex>
-            <Flex>
-              <Text className="text-neutral-400">Finished</Text>
-              <Text className="text-neutral-300">{new Date(s.finished_at).toLocaleString()}</Text>
-            </Flex>
+            {s.finished_at && (
+              <Flex>
+                <Text className="text-neutral-400">Finished</Text>
+                <Text className="text-neutral-300">{new Date(s.finished_at).toLocaleString()}</Text>
+              </Flex>
+            )}
           </div>
         </DashboardCard>
 

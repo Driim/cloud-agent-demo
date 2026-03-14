@@ -7,6 +7,7 @@ interface SessionFiltersProps {
 }
 
 const STATUSES: readonly { readonly value: SessionStatus; readonly label: string }[] = [
+  { value: 'active', label: 'Active' },
   { value: 'completed', label: 'Completed' },
   { value: 'merged', label: 'Merged' },
   { value: 'failed', label: 'Failed' },
@@ -14,6 +15,7 @@ const STATUSES: readonly { readonly value: SessionStatus; readonly label: string
 ]
 
 const STATUS_COLORS: Record<SessionStatus, string> = {
+  active: 'bg-orange-500',
   completed: 'bg-emerald-500',
   merged: 'bg-emerald-500',
   failed: 'bg-red-500',

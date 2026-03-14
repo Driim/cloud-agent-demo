@@ -6,6 +6,7 @@ const STATUS_CONFIG: Record<SessionStatus, { color: string; label: string }> = {
   merged: { color: 'emerald', label: 'Merged' },
   failed: { color: 'red', label: 'Failed' },
   timed_out: { color: 'amber', label: 'Timed Out' },
+  active: { color: 'orange', label: 'Active' },
 }
 
 interface StatusBadgeProps {

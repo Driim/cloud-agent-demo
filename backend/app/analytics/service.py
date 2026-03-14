@@ -28,6 +28,8 @@ from app.analytics.schemas import (
 
 _RANGE_DAYS: dict[str, int] = {"7d": 7, "30d": 30, "90d": 90}
 
+VALID_METRICS: frozenset[str] = frozenset(mock_data.TIMESERIES.keys())
+
 
 def get_overview() -> OverviewResponse:
     """Return KPI overview data for the organisation."""

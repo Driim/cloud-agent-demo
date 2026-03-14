@@ -15,7 +15,7 @@ import {
   TableCell,
 } from '@tremor/react'
 import StatusBadge from '../shared/StatusBadge'
-import { formatDuration } from '../../utils/format'
+import { formatDuration, formatUSD } from '../../utils/format'
 import type { SessionSummary, PaginationMeta } from '../../types/api'
 
 const columnHelper = createColumnHelper<SessionSummary>()
@@ -62,7 +62,7 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
       }),
       columnHelper.accessor('cost_usd', {
         header: 'Cost',
-        cell: (info) => <span className="font-mono">${info.getValue().toFixed(2)}</span>,
+        cell: (info) => <span className="font-mono">{formatUSD(info.getValue())}</span>,
       }),
       columnHelper.accessor('pr_number', {
         header: 'PR',
@@ -75,8 +75,10 @@ function SessionsTable({ data, pagination, onNextPage, onPrevPage }: SessionsTab
     [],
   )
 
+  const memoData = useMemo(() => [...data], [data])
+
   const table = useReactTable({
-    data: [...data],
+    data: memoData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   })

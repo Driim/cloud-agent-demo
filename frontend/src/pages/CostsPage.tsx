@@ -12,6 +12,7 @@ import TimeRangeSelector from '../components/shared/TimeRangeSelector'
 import LoadingSkeleton from '../components/shared/LoadingSkeleton'
 import ErrorState from '../components/shared/ErrorState'
 import { sanitizeApiError } from '../utils/errors'
+import { formatUSD } from '../utils/format'
 import type { TimeSeriesRange } from '../types/api'
 
 function CostsPage() {
@@ -60,7 +61,7 @@ function CostsPage() {
       <Grid numItemsSm={2} numItemsLg={2} className="gap-6">
         <KPICard
           title="Total Spend"
-          value={`$${costs.data.total_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+          value={formatUSD(costs.data.total_usd)}
         />
         {tokensPerPR.data && <TokensPerPRCard data={tokensPerPR.data} />}
       </Grid>

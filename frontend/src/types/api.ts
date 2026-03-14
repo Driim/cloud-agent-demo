@@ -23,7 +23,7 @@ export interface UserProfile {
 
 // ── Sessions ──
 
-export type SessionStatus = 'completed' | 'merged' | 'failed' | 'timed_out'
+export type SessionStatus = 'completed' | 'merged' | 'failed' | 'timed_out' | 'active'
 
 export interface SessionSummary {
   readonly session_id: string
@@ -49,7 +49,7 @@ export interface SessionDetail {
   readonly user: string
   readonly status: SessionStatus
   readonly started_at: string
-  readonly finished_at: string
+  readonly finished_at: string | null
   readonly duration_sec: number
   readonly tokens_used: number
   readonly cost_usd: number

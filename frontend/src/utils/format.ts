@@ -12,3 +12,17 @@ export function formatChartDate(isoTimestamp: string): string {
     day: 'numeric',
   })
 }
+
+export function formatNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`
+  return n.toString()
+}
+
+export function formatUSD(n: number): string {
+  return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+export function formatDelta(pct: number): string {
+  return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`
+}

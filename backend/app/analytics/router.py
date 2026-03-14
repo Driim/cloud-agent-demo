@@ -3,7 +3,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.analytics import service
-from app.analytics.mock_data import TIMESERIES
 from app.analytics.schemas import (
     AdoptionRateResponse,
     CostResponse,
@@ -23,7 +22,7 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 _VALID_RANGES: frozenset[str] = frozenset({"7d", "30d", "90d"})
 _VALID_GRANULARITIES: frozenset[str] = frozenset({"hour", "day"})
-_VALID_METRICS: frozenset[str] = frozenset(TIMESERIES.keys())
+_VALID_METRICS: frozenset[str] = service.VALID_METRICS
 
 
 def _validate_range(range_: str) -> None:

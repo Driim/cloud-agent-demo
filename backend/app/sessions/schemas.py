@@ -42,7 +42,7 @@ class SessionDetail(BaseModel):
     user: str
     status: SessionStatus
     started_at: AwareDatetime
-    finished_at: AwareDatetime
+    finished_at: AwareDatetime | None = None
     duration_sec: int
     tokens_used: int
     cost_usd: float

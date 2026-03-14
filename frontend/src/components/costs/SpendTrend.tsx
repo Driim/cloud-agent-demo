@@ -2,7 +2,7 @@ import { LineChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
 import ChartTooltip from '../shared/ChartTooltip'
 import type { TimeSeriesResponse } from '../../types/api'
-import { formatChartDate } from '../../utils/format'
+import { formatChartDate, formatUSD } from '../../utils/format'
 
 interface SpendTrendProps {
   readonly data: TimeSeriesResponse
@@ -23,11 +23,11 @@ function SpendTrend({ data }: SpendTrendProps) {
         index="date"
         categories={['Spend']}
         colors={['violet']}
-        valueFormatter={(n: number) => `$${n.toFixed(2)}`}
+        valueFormatter={formatUSD}
         yAxisWidth={56}
         showAnimation
         customTooltip={(props) => (
-          <ChartTooltip {...props} valueFormatter={(n: number) => `$${n.toFixed(2)}`} />
+          <ChartTooltip {...props} valueFormatter={formatUSD} />
         )}
       />
     </DashboardCard>

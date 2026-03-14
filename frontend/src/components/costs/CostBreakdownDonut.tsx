@@ -2,6 +2,7 @@ import { DonutChart, Title } from '@tremor/react'
 import DashboardCard from '../shared/DashboardCard'
 import ChartTooltip from '../shared/ChartTooltip'
 import type { CostLineItem } from '../../types/api'
+import { formatUSD } from '../../utils/format'
 
 interface CostBreakdownDonutProps {
   readonly data: readonly CostLineItem[]
@@ -22,10 +23,10 @@ function CostBreakdownDonut({ data }: CostBreakdownDonutProps) {
         category="value"
         index="name"
         colors={['violet', 'orange', 'sky', 'emerald']}
-        valueFormatter={(n: number) => `$${n.toFixed(2)}`}
+        valueFormatter={formatUSD}
         showAnimation
         customTooltip={(props) => (
-          <ChartTooltip {...props} valueFormatter={(n: number) => `$${n.toFixed(2)}`} />
+          <ChartTooltip {...props} valueFormatter={formatUSD} />
         )}
       />
     </DashboardCard>
