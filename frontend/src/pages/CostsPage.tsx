@@ -65,14 +65,14 @@ function CostsPage() {
         {tokensPerPR.data && <TokensPerPRCard data={tokensPerPR.data} />}
       </Grid>
 
+      <QuotasList data={quotas.data} />
+
       <SpendTrend data={spendSeries.data} />
 
       <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
         <CostBreakdownDonut data={costs.data.breakdown} />
         {costPerSession.data && <CostTrendChart data={costPerSession.data} />}
       </Grid>
-
-      <QuotasList data={quotas.data} />
       <BudgetAlerts quotas={quotas.data} />
     </div>
   )

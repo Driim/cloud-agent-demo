@@ -40,6 +40,27 @@ test.describe('Overview page', () => {
     await expect(overview.main.getByText('org/backend').first()).toBeVisible()
   })
 
+  test('displays KPI cards in correct order: PRs Merged before Cost per Merged PR', async ({ page }) => {
+    const overview = new OverviewPage(page)
+    await overview.goto()
+
+    const kpiTitles = await overview.main
+      .locator('[class*="DashboardCard"], [class*="Card"]')
+      .filter({ has: page.locator('text=/Total Sessions|Token Consumption|PRs Merged|Cost per Merged PR|Total Spend/') })
+      .locator('p, span')
+      .filter({ hasText: /^(Total Sessions|Token Consumption|PRs Merged|Cost per Merged PR|Total Spend)$/ })
+      .allTextContents()
+
+    const prsMergedIdx = kpiTitles.indexOf('PRs Merged')
+    const costPerPRIdx = kpiTitles.indexOf('Cost per Merged PR')
+    const totalSpendIdx = kpiTitles.indexOf('Total Spend')
+
+    expect(prsMergedIdx).toBeGreaterThan(-1)
+    expect(costPerPRIdx).toBeGreaterThan(-1)
+    expect(costPerPRIdx).toBe(prsMergedIdx + 1)
+    expect(totalSpendIdx).toBeGreaterThan(costPerPRIdx)
+  })
+
   test('shows error when API fails', async ({ page }) => {
     await page.route('**/api/v1/analytics/overview', (route) =>
       route.fulfill({ status: 500, body: 'Server error' }),

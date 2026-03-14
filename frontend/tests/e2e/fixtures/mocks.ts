@@ -8,6 +8,7 @@ import type {
   CostResponse,
   QuotaItem,
   TeamMemberStats,
+  TokensPerPRResponse,
 } from '../../../src/types/api'
 
 // ── Mock data ──────────────────────────────────────────────────────────────
@@ -187,6 +188,21 @@ export const mockTeam: TeamMemberStats[] = [
   },
 ]
 
+export const mockTokensPerPR: TokensPerPRResponse = {
+  avg_tokens_per_pr: 54_200,
+  delta_pct: -8,
+}
+
+export const mockCostPerSessionSeries: TimeSeriesResponse = {
+  metric: 'cost_per_session',
+  range: '30d',
+  granularity: 'day',
+  points: Array.from({ length: 30 }, (_, i) => ({
+    timestamp: new Date(Date.now() - (29 - i) * 86400000).toISOString(),
+    value: 1.2 + Math.random() * 0.8,
+  })),
+}
+
 // ── Route mock helpers ─────────────────────────────────────────────────────
 
 export async function mockApiRoutes(page: Page): Promise<void> {
@@ -222,6 +238,14 @@ export async function mockApiRoutes(page: Page): Promise<void> {
 
   await page.route('**/api/v1/analytics/quotas', (route) =>
     route.fulfill({ json: mockQuotas }),
+  )
+
+  await page.route('**/api/v1/analytics/tokens-per-pr', (route) =>
+    route.fulfill({ json: mockTokensPerPR }),
+  )
+
+  await page.route('**/api/v1/analytics/timeseries/cost_per_session**', (route) =>
+    route.fulfill({ json: mockCostPerSessionSeries }),
   )
 
   await page.route('**/api/v1/analytics/team', (route) =>

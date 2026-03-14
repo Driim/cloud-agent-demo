@@ -32,6 +32,27 @@ test.describe('Costs page', () => {
     await expect(page.locator('main svg').first()).toBeAttached()
   })
 
+  test('displays Usage Quotas below Tokens per Merged PR', async ({ page }) => {
+    const costs = new CostsPage(page)
+    await costs.goto()
+
+    const main = page.locator('main')
+
+    const tokensPerPR = main.getByText('Tokens per Merged PR').first()
+    const quotasTitle = main.getByText('Usage Quotas').first()
+
+    await expect(tokensPerPR).toBeVisible()
+    await expect(quotasTitle).toBeVisible()
+
+    const tokensBox = await tokensPerPR.boundingBox()
+    const quotasBox = await quotasTitle.boundingBox()
+
+    expect(tokensBox).not.toBeNull()
+    expect(quotasBox).not.toBeNull()
+    // Usage Quotas should appear below Tokens per Merged PR
+    expect(quotasBox!.y).toBeGreaterThan(tokensBox!.y)
+  })
+
   test('shows error when API fails', async ({ page }) => {
     await page.route('**/api/v1/analytics/costs', (route) =>
       route.fulfill({ status: 500, body: 'Internal server error' }),

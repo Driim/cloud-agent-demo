@@ -28,14 +28,18 @@ function OverviewKPIs({ data }: OverviewKPIsProps) {
         value={formatNumber(data.total_tokens)}
       />
       <KPICard
-        title="Total Spend"
-        value={formatUSD(data.total_spend_usd)}
-      />
-      <KPICard
         title="PRs Merged"
         value={data.total_prs_merged.toString()}
         delta={`${(data.success_rate * 100).toFixed(0)}% success`}
         deltaType="moderateIncrease"
+      />
+      <KPICard
+        title="Cost per Merged PR"
+        value={formatUSD(data.avg_cost_per_pr_usd)}
+      />
+      <KPICard
+        title="Total Spend"
+        value={formatUSD(data.total_spend_usd)}
       />
     </Grid>
   )
