@@ -53,6 +53,32 @@ test.describe('Costs page', () => {
     expect(quotasBox!.y).toBeGreaterThan(tokensBox!.y)
   })
 
+  test('quota items show status badges and percentages', async ({ page }) => {
+    const costs = new CostsPage(page)
+    await costs.goto()
+
+    const main = page.locator('main')
+
+    // Sessions: 1050/1500 = 70% → Normal
+    await expect(main.getByText('Sessions').first()).toBeVisible()
+    const pctSessions = main.locator('[data-testid="quota-pct-Sessions"]')
+    await expect(pctSessions).toHaveText('70%')
+
+    // At least one "Normal" badge visible (all mock quotas are under 75%)
+    const normalBadges = main.getByText('Normal')
+    await expect(normalBadges.first()).toBeVisible()
+  })
+
+  test('quota items show remaining amounts', async ({ page }) => {
+    const costs = new CostsPage(page)
+    await costs.goto()
+
+    const main = page.locator('main')
+    // Sessions: 1500 - 1050 = 450 → "450 remaining"
+    const remaining = main.locator('[data-testid="quota-remaining-Sessions"]')
+    await expect(remaining).toHaveText('450 remaining')
+  })
+
   test('spend chart tooltip has opaque background and proper spacing', async ({ page }) => {
     const costs = new CostsPage(page)
     await costs.goto()
