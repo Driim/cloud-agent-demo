@@ -194,26 +194,27 @@ REPOS: Final[list[str]] = [
 ]
 
 # Event type distribution (20-element cycle):
-# session_started 5 (25%), session_completed 5 (25%), pr_created 4 (20%),
-# pr_merged 3 (15%), session_failed 2 (10%), pr_review_requested 1 (5%)
+# session_started 6 (30%), session_completed 7 (35%),
+# pr_merged 5 (25%), session_failed 2 (10%)
+# Matches ActivityEventType Literal in team/schemas.py
 _EVENT_TYPES: Final[list[str]] = [
     "session_started",
     "session_completed",
-    "pr_created",
+    "pr_merged",
+    "session_started",
+    "session_completed",
     "session_started",
     "pr_merged",
     "session_completed",
-    "pr_created",
     "session_failed",
     "session_started",
     "session_completed",
-    "pr_created",
     "pr_merged",
     "session_started",
     "session_completed",
-    "pr_review_requested",
+    "pr_merged",
+    "session_completed",
     "session_started",
-    "pr_created",
     "session_completed",
     "pr_merged",
     "session_failed",
@@ -235,10 +236,8 @@ def _generate_events() -> list[dict]:
         descriptions = {
             "session_started": f"{name} started a session on {repo}",
             "session_completed": f"{name} completed a session on {repo}",
-            "pr_created": f"{name} created PR #{100 + i} on {repo}",
             "pr_merged": f"{name} merged PR #{100 + i} on {repo}",
             "session_failed": f"{name}'s session failed on {repo}",
-            "pr_review_requested": f"{name} requested review for PR #{100 + i} on {repo}",
         }
 
         events.append(

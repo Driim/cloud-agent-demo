@@ -53,10 +53,15 @@ class TestPostToken:
     """Tests for POST /api/v1/auth/token."""
 
     @pytest.mark.asyncio
-    async def test_returns_tokens(self, client: AsyncClient) -> None:
+    async def test_returns_tokens_with_valid_credentials(
+        self, client: AsyncClient
+    ) -> None:
         resp = await client.post(
             "/api/v1/auth/token",
-            json={"email": "test@example.com", "password": "pass"},
+            json={
+                "email": MOCK_USER["email"],
+                "password": MOCK_USER["password"],
+            },
         )
         assert resp.status_code == 200
         body = resp.json()
@@ -65,7 +70,19 @@ class TestPostToken:
         assert body["token_type"] == "bearer"
 
     @pytest.mark.asyncio
-    async def test_missing_fields_returns_422(self, client: AsyncClient) -> None:
+    async def test_returns_401_with_invalid_credentials(
+        self, client: AsyncClient
+    ) -> None:
+        resp = await client.post(
+            "/api/v1/auth/token",
+            json={"email": "wrong@example.com", "password": "wrong"},
+        )
+        assert resp.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_missing_fields_returns_422(
+        self, client: AsyncClient
+    ) -> None:
         resp = await client.post("/api/v1/auth/token", json={})
         assert resp.status_code == 422
 
@@ -74,15 +91,27 @@ class TestPostRefresh:
     """Tests for POST /api/v1/auth/refresh."""
 
     @pytest.mark.asyncio
-    async def test_returns_new_tokens(self, client: AsyncClient) -> None:
+    async def test_returns_new_tokens_with_valid_refresh(
+        self, client: AsyncClient
+    ) -> None:
         resp = await client.post(
             "/api/v1/auth/refresh",
-            json={"refresh_token": "old.token"},
+            json={"refresh_token": MOCK_REFRESH_TOKEN},
         )
         assert resp.status_code == 200
         body = resp.json()
         assert body["access_token"] == MOCK_ACCESS_TOKEN
         assert body["refresh_token"] == MOCK_REFRESH_TOKEN
+
+    @pytest.mark.asyncio
+    async def test_returns_401_with_invalid_refresh(
+        self, client: AsyncClient
+    ) -> None:
+        resp = await client.post(
+            "/api/v1/auth/refresh",
+            json={"refresh_token": "invalid.token"},
+        )
+        assert resp.status_code == 401
 
 
 class TestGetMe:

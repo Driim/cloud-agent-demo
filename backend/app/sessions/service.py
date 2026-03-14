@@ -54,11 +54,20 @@ def list_sessions(
     page = filtered[start_index : start_index + limit]
     has_more = start_index + limit < len(filtered)
     next_cursor = page[-1]["session_id"] if has_more and page else None
-    prev_cursor = (
-        filtered[start_index - 1]["session_id"]
-        if start_index > 0 and filtered
-        else None
-    )
+
+    # prev_cursor points to the cursor needed to fetch the previous page.
+    # cursor=X means "start after X", so prev page's cursor is the item
+    # just before the previous page's first element.
+    # If the previous page is page 1 (start_index <= limit), no cursor
+    # is needed — we use a special empty string so the frontend can still
+    # detect "there IS a previous page" and reset to cursor=undefined.
+    if start_index <= 0:
+        prev_cursor = None
+    elif start_index <= limit:
+        # Previous page is the first page
+        prev_cursor = ""
+    else:
+        prev_cursor = filtered[start_index - limit - 1]["session_id"]
 
     summaries = [
         SessionSummary(**{k: v for k, v in s.items() if k in _SUMMARY_FIELDS})

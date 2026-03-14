@@ -12,7 +12,6 @@ from app.team.router import router as team_router
 
 app = FastAPI(
     title=settings.app_name,
-    debug=settings.debug,
     docs_url="/docs",
     redoc_url="/redoc",
 )

@@ -27,7 +27,6 @@ from app.analytics.schemas import (
 )
 
 _RANGE_DAYS: dict[str, int] = {"7d": 7, "30d": 30, "90d": 90}
-_VALID_METRICS = frozenset(mock_data.TIMESERIES.keys())
 
 
 def get_overview() -> OverviewResponse:
@@ -51,16 +50,17 @@ def get_timeseries(
     range_: str = "30d",
     granularity: str = "day",
 ) -> TimeSeriesResponse:
-    """Return time-series points filtered by range and granularity.
+    """Return time-series points filtered by range.
 
     Args:
-        metric: One of tokens | sessions | spend | prs (validated by router).
+        metric: Validated by router against TIMESERIES keys.
         range_: One of 7d | 30d | 90d (validated by router).
         granularity: One of hour | day (validated by router).
-
-    Returns:
-        TimeSeriesResponse with the filtered points.
+            Mock data only contains daily points; hourly granularity
+            returns the same daily data until a real DB is wired in.
     """
+    if metric not in mock_data.TIMESERIES:
+        raise ValueError(f"Unknown metric: {metric}")
     days = _RANGE_DAYS[range_]
     all_points = mock_data.TIMESERIES[metric]
     filtered = all_points[-days:]

@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.analytics import service
+from app.analytics.mock_data import TIMESERIES
 from app.analytics.schemas import (
     AdoptionRateResponse,
     CostResponse,
@@ -20,16 +21,25 @@ from app.auth.schemas import UserProfile
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
-_VALID_RANGES = {"7d", "30d", "90d"}
-_VALID_GRANULARITIES = {"hour", "day"}
-_VALID_METRICS = {
-    "tokens",
-    "sessions",
-    "spend",
-    "prs",
-    "latency_p95",
-    "cost_per_session",
-}
+_VALID_RANGES: frozenset[str] = frozenset({"7d", "30d", "90d"})
+_VALID_GRANULARITIES: frozenset[str] = frozenset({"hour", "day"})
+_VALID_METRICS: frozenset[str] = frozenset(TIMESERIES.keys())
+
+
+def _validate_range(range_: str) -> None:
+    if range_ not in _VALID_RANGES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid range. Valid values: {sorted(_VALID_RANGES)}",
+        )
+
+
+def _validate_granularity(granularity: str) -> None:
+    if granularity not in _VALID_GRANULARITIES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid granularity. Valid values: {sorted(_VALID_GRANULARITIES)}",
+        )
 
 
 @router.get("/overview", response_model=OverviewResponse)
@@ -43,7 +53,7 @@ async def get_overview(
 @router.get("/timeseries/{metric}", response_model=TimeSeriesResponse)
 async def get_timeseries(
     metric: str,
-    range: str = Query(default="30d", description="Time range: 7d | 30d | 90d"),
+    range_: str = Query(default="30d", alias="range", description="Time range: 7d | 30d | 90d"),
     granularity: str = Query(default="day", description="Granularity: hour | day"),
     _: UserProfile = Depends(get_current_user),
 ) -> TimeSeriesResponse:
@@ -51,19 +61,11 @@ async def get_timeseries(
     if metric not in _VALID_METRICS:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Unknown metric '{metric}'. Valid values: {sorted(_VALID_METRICS)}",
+            detail=f"Invalid metric. Valid values: {sorted(_VALID_METRICS)}",
         )
-    if range not in _VALID_RANGES:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Unknown range '{range}'. Valid values: {sorted(_VALID_RANGES)}",
-        )
-    if granularity not in _VALID_GRANULARITIES:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Unknown granularity '{granularity}'. Valid values: {sorted(_VALID_GRANULARITIES)}",
-        )
-    return service.get_timeseries(metric=metric, range_=range, granularity=granularity)
+    _validate_range(range_)
+    _validate_granularity(granularity)
+    return service.get_timeseries(metric=metric, range_=range_, granularity=granularity)
 
 
 @router.get("/quotas", response_model=list[QuotaItem])
@@ -92,17 +94,14 @@ async def get_errors(
 
 @router.get("/token-breakdown", response_model=MultiSeriesResponse)
 async def get_token_breakdown(
-    range: str = Query(default="30d", description="Time range: 7d | 30d | 90d"),
+    range_: str = Query(default="30d", alias="range", description="Time range: 7d | 30d | 90d"),
     granularity: str = Query(default="day", description="Granularity: hour | day"),
     _: UserProfile = Depends(get_current_user),
 ) -> MultiSeriesResponse:
     """Return stacked input/output token time-series."""
-    if range not in _VALID_RANGES:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Unknown range '{range}'. Valid values: {sorted(_VALID_RANGES)}",
-        )
-    return service.get_token_breakdown(range_=range, granularity=granularity)
+    _validate_range(range_)
+    _validate_granularity(granularity)
+    return service.get_token_breakdown(range_=range_, granularity=granularity)
 
 
 @router.get("/session-outcomes", response_model=SessionOutcomesResponse)

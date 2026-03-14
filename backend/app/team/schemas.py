@@ -1,6 +1,12 @@
 """Pydantic schemas for team module."""
 
+from typing import Literal
+
 from pydantic import AwareDatetime, BaseModel
+
+ActivityEventType = Literal[
+    "session_started", "session_completed", "pr_merged", "session_failed"
+]
 
 
 class TeamMemberStats(BaseModel):
@@ -21,7 +27,7 @@ class ActivityEvent(BaseModel):
 
     event_id: str
     timestamp: AwareDatetime
-    event_type: str  # session_started | session_completed | pr_merged | session_failed
+    event_type: ActivityEventType
     user: str
     repo: str
     description: str

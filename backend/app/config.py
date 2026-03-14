@@ -7,7 +7,6 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     app_name: str = "AgentCloud Analytics Dashboard"
-    debug: bool = False
     cors_origins: list[str] = [
         "http://localhost:3000",
         "http://localhost:5173",

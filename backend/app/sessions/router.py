@@ -5,7 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.auth.dependencies import get_current_user
 from app.auth.schemas import UserProfile
 from app.sessions import service
-from app.sessions.schemas import PaginatedSessionsResponse, SessionDetail
+from app.sessions.schemas import (
+    VALID_SESSION_STATUSES,
+    PaginatedSessionsResponse,
+    SessionDetail,
+)
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -24,6 +28,11 @@ async def list_sessions(
     _: UserProfile = Depends(get_current_user),
 ) -> PaginatedSessionsResponse:
     """Return a paginated list of agent sessions."""
+    if status_filter is not None and status_filter not in VALID_SESSION_STATUSES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid status. Valid values: {sorted(VALID_SESSION_STATUSES)}",
+        )
     try:
         return service.list_sessions(
             status=status_filter,
@@ -32,11 +41,11 @@ async def list_sessions(
             cursor=cursor,
             limit=limit,
         )
-    except ValueError as exc:
+    except ValueError:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
-        ) from exc
+            detail="Invalid cursor",
+        )
 
 
 @router.get("/{session_id}", response_model=SessionDetail)
@@ -49,6 +58,6 @@ async def get_session(
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Session '{session_id}' not found",
+            detail="Session not found",
         )
     return result

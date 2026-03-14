@@ -1,13 +1,15 @@
 """Shared test fixtures."""
 
+from collections.abc import AsyncGenerator
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from app.main import app
 
 
-@pytest.fixture
-async def client() -> AsyncClient:
+@pytest.fixture(scope="function")
+async def client() -> AsyncGenerator[AsyncClient, None]:
     """Async HTTP client wired to the FastAPI test app."""
     transport = ASGITransport(app=app)
     headers = {"Authorization": "Bearer mock.access.token"}
