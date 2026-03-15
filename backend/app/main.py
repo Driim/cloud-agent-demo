@@ -48,6 +48,7 @@ app.include_router(api_router)
 _static_dir = Path(__file__).resolve().parent.parent / "static"
 if _static_dir.is_dir():
     app.mount(
-        "/", StaticFiles(directory=str(_static_dir), html=True),
+        "/",
+        StaticFiles(directory=str(_static_dir), html=True),
         name="static",
     )
