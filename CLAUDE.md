@@ -86,7 +86,7 @@ React 18 + Vite + TypeScript (strict mode).
 |------|-----------|
 | Auth | `POST /auth/token`, `POST /auth/refresh`, `GET /auth/me` |
 | Sessions | `GET /sessions` (cursor pagination, filters: status/repo/user), `GET /sessions/{id}` |
-| Analytics | `GET /analytics/overview`, `/timeseries/{metric}`, `/quotas`, `/costs`, `/errors` |
+| Analytics | `GET /analytics/overview`, `/timeseries/{metric}`, `/quotas`, `/costs`, `/errors`, `/token-breakdown`, `/session-outcomes`, `/tokens-per-pr`, `/duration-distribution`, `/adoption-rate` |
 | Team | `GET /analytics/team`, `GET /analytics/team/feed` (SSE) |
 | Repos | `GET /analytics/repositories` |
 | Health | `GET /health` (no auth required) |

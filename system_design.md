@@ -396,7 +396,7 @@ If the application has a bug and omits the `WHERE org_id = ?` clause, the row po
 - **Primary key** — `ORDER BY (org_id, ...)` ensures optimal data skipping for all tenant-scoped queries
 - **Retention (TTL)** — raw events 90 days (~140 GB at current load, well within single-node capacity), aggregated data 1 year
 
-> Full schema definitions, queries, and migration details: [CLICKHOUSE.md](CLICKHOUSE.md)
+> Full schema definitions, queries, and migration details: [clickhouse.md](clickhouse.md)
 
 ### 3.6 Real-Time Layer (Centrifugo)
 
@@ -420,7 +420,7 @@ The API Gateway is the single entry point for all client traffic. Key responsibi
 - **API versioning** — routes `/api/v1/` prefix to the appropriate service version
 - **Load balancing** — distributes requests across stateless service instances with health checks
 
-> Full configuration, rate limit tiers, and routing rules: [API_GATEWAY.md](API_GATEWAY.md)
+> Full configuration, rate limit tiers, and routing rules: [api_gateway.md](api_gateway.md)
 
 ### 3.8 Alerting Strategy
 

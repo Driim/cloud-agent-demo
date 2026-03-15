@@ -4,29 +4,15 @@ This document contains ClickHouse-specific SQL schemas, DDL examples, and backen
 
 ---
 
-## 1. Ingestion Pipeline (Kafka Engine)
+## 1. Ingestion Pipeline (Ingestion Worker)
 
-### Step 1.1 — Kafka Engine Consumer Tables
+A stateless **Ingestion Worker** (Python service, or [Vector](https://vector.dev/) / [Benthos](https://www.benthos.dev/) for a config-driven approach) sits between Kafka and ClickHouse. It consumes `agent.events`, validates schemas, routes malformed events to a Dead Letter Queue (`events.dlq` topic), assembles optimally-sized batches, and inserts into ClickHouse via `INSERT ... FORMAT Native`.
 
-For each Kafka topic, create a table using the `Kafka` engine. ClickHouse acts as a consumer directly — no Python workers needed for ingestion.
+> **Why not Kafka Engine?** ClickHouse Kafka Engine eliminates the worker tier but introduces production risks: no DLQ for poison pills, limited batching control, and a single malformed message can stall the entire pipeline. See [system_design.md §3.3](system_design.md) for the full rationale.
 
-```sql
-CREATE TABLE kafka_agent_events (
-    org_id     String,
-    session_id String,
-    event_id   String,
-    status     String,
-    tokens     UInt32,
-    cost       Float64,
-    created_at DateTime
-) ENGINE = Kafka
-SETTINGS kafka_broker_list = 'broker:9092',
-         kafka_topic_list   = 'agent.events',
-         kafka_group_name   = 'clickhouse_ingestion',
-         kafka_format       = 'JSONEachRow';
-```
+### Step 1.1 — Raw Storage Tables (MergeTree)
 
-### Step 1.2 — Raw Storage Tables (MergeTree)
+The Ingestion Worker inserts validated events directly into this table.
 
 ```sql
 CREATE TABLE sessions_raw (
@@ -39,13 +25,6 @@ CREATE TABLE sessions_raw (
     created_at DateTime
 ) ENGINE = MergeTree()
 ORDER BY (org_id, session_id, created_at);
-```
-
-### Step 1.3 — Materialized View: Kafka → Raw
-
-```sql
-CREATE MATERIALIZED VIEW mv_kafka_to_raw TO sessions_raw AS
-SELECT * FROM kafka_agent_events;
 ```
 
 ---
@@ -161,9 +140,9 @@ async def get_current_org(token: str = Depends(oauth2_scheme)) -> str:
 ClickHouse TTL replaces TimescaleDB retention policies.
 
 ```sql
--- Raw events: 7 days
+-- Raw events: 90 days
 ALTER TABLE sessions_raw
-    MODIFY TTL created_at + INTERVAL 7 DAY;
+    MODIFY TTL created_at + INTERVAL 90 DAY;
 
 -- Aggregated data: 1 year
 ALTER TABLE sessions_aggregated
@@ -172,17 +151,9 @@ ALTER TABLE sessions_aggregated
 
 ---
 
-## 6. Pagination: Count Queries
+## 6. Pagination
 
-Unlike TimescaleDB's `approximate_row_count()`, ClickHouse `COUNT()` with an `org_id` filter is near-instant due to sparse index scans on the primary key:
-
-```sql
-SELECT count()
-FROM sessions_raw
-WHERE org_id = {org_id:String};
-```
-
-No special approximation function is needed.
+Cursor-based pagination uses `has_more` (computed by fetching `limit + 1` rows). No `total` or `approx_total` field is returned by the paginated endpoint — when a count is needed (e.g., Overview page badge), it comes from a pre-aggregated materialized view via `/analytics/overview`, not from `COUNT(*)` over the raw table. See [system_design.md §2.4](system_design.md) for the rationale.
 
 ---
 
@@ -210,8 +181,6 @@ WHERE org_id = {org_id:String}
 
 | Table | Engine | Role |
 |---|---|---|
-| `kafka_agent_events` | Kafka | Consumes `agent.events` topic directly |
-| `sessions_raw` | MergeTree | Structured raw event storage with TTL |
-| `sessions_aggregated` | AggregatingMergeTree | Per-session `argMax` state + token sums |
-| `mv_kafka_to_raw` | Materialized View | Kafka Engine → `sessions_raw` |
+| `sessions_raw` | MergeTree | Raw event storage (populated by Ingestion Worker), TTL 90 days |
+| `sessions_aggregated` | AggregatingMergeTree | Per-session `argMax` state + token sums, TTL 1 year |
 | `mv_sessions_aggregated` | Materialized View | `sessions_raw` → `sessions_aggregated` |

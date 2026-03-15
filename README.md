@@ -88,7 +88,7 @@ All routes are prefixed with `/api/v1`.
 |------|-----------|
 | Auth | `POST /auth/token`, `POST /auth/refresh`, `GET /auth/me` |
 | Sessions | `GET /sessions`, `GET /sessions/{id}` |
-| Analytics | `GET /analytics/overview`, `/timeseries/{metric}`, `/quotas`, `/costs`, `/errors` |
+| Analytics | `GET /analytics/overview`, `/timeseries/{metric}`, `/quotas`, `/costs`, `/errors`, `/token-breakdown`, `/session-outcomes`, `/tokens-per-pr`, `/duration-distribution`, `/adoption-rate` |
 | Team | `GET /analytics/team`, `GET /analytics/team/feed` (SSE) |
 | Repositories | `GET /analytics/repositories` |
 
