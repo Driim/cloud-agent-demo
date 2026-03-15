@@ -61,52 +61,44 @@
 ## Step 2: High-Level Design
 ### 2.1 Core Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                            CLIENT LAYER                                 │
-│  React SPA · Tremor (charts/KPI) · TanStack Table · Tailwind CSS       │
-│  Auth tokens in httpOnly cookies · TanStack Query (client-side cache)   │
-└──────────────────────────────┬──────────────────────────────────────────┘
-                               │ HTTPS (TLS 1.3)
-                               ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          API GATEWAY                                    │
-│  Load Balancer · Rate Limiter (per org/tier) · JWT Validation           │
-│  WAF (OWASP) · TLS Termination · API Versioning (/api/v1/)             │
-└──────────────────────────────┬──────────────────────────────────────────┘
-                               │
-              ┌────────────────┼────────────────┐
-              ▼                ▼                 ▼
-┌──────────────────┐ ┌─────────────────┐ ┌──────────────────┐
-│   AUTH SERVICE   │ │ ANALYTICS SVC   │ │  SESSION SVC     │
-│  OAuth2/OIDC     │ │ KPI aggregation │ │ Session CRUD     │
-│  JWT issue/verify│ │ Time-series API │ │ Status tracking  │
-│  RBAC enforcement│ │ Quota checks    │ │ Filtering/search │
-│  Refresh rotation│ │ Cost compute    │ │ Cursor pagination│
-└────────┬─────────┘ └────────┬────────┘ └────────┬─────────┘
-         │                    │                    │
-         ▼                    ▼                    ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           DATA LAYER                                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌───────┐  ┌───────────────────┐  │
-│  │ ClickHouse   │  │ PostgreSQL   │  │ Redis │  │ Kafka             │  │
-│  │ Metrics &    │  │ Users, Orgs  │  │ Cache │  │ Agent telemetry   │  │
-│  │ time-series  │  │ Sessions     │  │ (TTL) │  │ events            │  │
-│  │ Aggregation  │  │ Repos, PRs   │  │       │  │                   │  │
-│  └──────────────┘  └──────────────┘  └───────┘  └───────────────────┘  │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │ Centrifugo (real-time gateway)                                   │   │
-│  │ WebSocket + SSE · JWT auth · Redis-backed scaling                │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                      AGENT INFRASTRUCTURE                               │
-│  Sandboxed containers (Firecracker/gVisor) · GitHub proxy               │
-│  Isolated execution per session · Telemetry emitter (→ Kafka)           │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+![Simplified Architecture](docs/diagrams/simplifyed-architecture.png)
+
+The system follows a **layered architecture** with strict separation of concerns across 5 tiers:
+
+1. **Client Layer** — a single-page application responsible for rendering analytics, managing client-side cache, and maintaining authenticated sessions. The client never accesses data stores directly; all data flows through the API layer.
+
+2. **API Gateway** — a stateless entry point that handles TLS termination, rate limiting (per organization and pricing tier), request authentication (token validation), and API versioning. It routes traffic to the appropriate backend service and acts as a security boundary (WAF, DDoS protection).
+
+3. **Service Layer** — a set of independently deployable services, each owning a single domain:
+   - *Auth Service* — identity federation with external providers, token issuance and rotation, role-based access control enforcement.
+   - *Analytics Service* — KPI aggregation, time-series queries, quota tracking, cost computation.
+   - *Session Service* — session lifecycle management, filtering, search, cursor-based pagination.
+
+   Services are stateless and horizontally scalable. Each service communicates with the data layer through well-defined interfaces and never exposes storage details to the layers above.
+
+4. **Data Layer** — composed of purpose-specific stores:
+   - *OLAP store* — columnar storage optimized for analytical queries, aggregation, and time-series data with built-in compression and TTL-based retention.
+   - *OLTP store* — relational database for transactional data (users, organizations, metadata) with row-level security for tenant isolation.
+   - *Cache* — in-memory key-value store for short-lived data (computed KPIs, token denylist) with TTL-based expiration.
+   - *Message broker* — durable event stream that decouples agent infrastructure from the analytics pipeline, supports replay, and fans out to multiple consumers.
+   - *Real-time gateway* — a dedicated component that manages persistent client connections (WebSocket/SSE), handles reconnection and message recovery, and scales horizontally via the cache layer's pub/sub capability.
+
+5. **Agent Infrastructure** — sandboxed execution environments where AI agents run. Each session is fully isolated. The infrastructure emits telemetry events into the message broker and has no direct dependency on the dashboard services.
+
+#### Data Flow
+
+![Data Flow](docs/diagrams/data-flow.png)
+
+The data flow follows a **push-based, event-driven pipeline** with three distinct paths:
+
+**1. Ingestion path (agent → analytics store):**
+Agent sandboxes emit structured telemetry events (session status changes, token consumption, cost accrual, errors) into the message broker. The OLAP store consumes events directly from the broker, writing them into append-only raw storage. Materialized views incrementally maintain pre-aggregated state (latest status, total tokens, final cost per session) without requiring batch recomputation.
+
+**2. Query path (client → API → store → client):**
+The client issues authenticated API requests through the gateway. The gateway validates the token and routes the request to the appropriate service. The service reads from the cache (hit) or queries the OLAP/OLTP store (miss), populates the cache, and returns the response. All queries are scoped by organization ID extracted from the verified token — there is no way to query across tenant boundaries.
+
+**3. Real-time path (event → client push):**
+Specialized consumers on the message broker evaluate business rules (budget threshold breaches, error spikes) and session state transitions. When a notable event occurs, the consumer publishes a message to the real-time gateway, which pushes it to all subscribed clients for that organization's channel. The client receives updates without polling, keeping the activity feed, alerts, and session statuses live.
 
 ### 2.2 API Design
 
@@ -141,39 +133,13 @@ Repositories:
 
 ### 2.3 Data Model
 
-**PostgreSQL** — transactional data:
+**Transactional** data:
 
-```
-┌─────────────┐       ┌──────────────┐       ┌──────────────┐
-│ organizations│       │    users     │       │ repositories │
-├─────────────┤       ├──────────────┤       ├──────────────┤
-│ id (PK)     │◄──┐   │ id (PK)      │       │ id (PK)      │
-│ name        │   ├───│ org_id (FK)  │   ┌──│ org_id (FK)  │
-│ plan        │   │   │ email        │   │   │ name         │
-│ quota_limits│   │   │ role (RBAC)  │   │   │ url          │
-└─────────────┘   │   └──────────────┘   │   └──────────────┘
-                  │                       │
-                  └───────────────────────┘
-```
+![Transactional Data Model](docs/diagrams/transactional-data-model.png)
 
-**ClickHouse** — analytics and time-series:
+**Analytics and time-series**:
 
-```
-┌──────────────────┐      MV       ┌────────────────────────┐
-│  sessions_raw    │ ───────────▶  │  sessions_aggregated   │
-├──────────────────┤               ├────────────────────────┤
-│ org_id           │               │ org_id                 │
-│ session_id       │               │ session_id             │
-│ event_id         │               │ latest_status (argMax) │
-│ status           │               │ total_tokens (sum)     │
-│ tokens           │               │ final_cost (argMax)    │
-│ cost             │               │ last_updated (max)     │
-│ created_at       │               └────────────────────────┘
-│ ORDER BY (org_id,│
-│  session_id,     │
-│  created_at)     │
-└──────────────────┘
-```
+![Analytics Data Model](docs/diagrams/analytics-data-model.png)
 
 ### 2.4 API Response Format (Pagination)
 
@@ -196,48 +162,12 @@ Cursor-based pagination — stable under concurrent writes:
 
 ## Step 3: Deep Dive
 
-### 3.1 Data Ingestion Pipeline
-
-Key architectural decision — **ClickHouse Kafka Engine** for direct event consumption without intermediate workers:
-
-```
-Agent Sandbox                Kafka                     ClickHouse
-┌─────────────┐   emit   ┌──────────────┐  Kafka     ┌────────────────────┐
-│ Code exec   │────────▶ │ agent.events │──Engine──▶ │ sessions_raw       │
-│ Token usage │          │ agent.tokens │            │     │               │
-│ PR creation │          │ agent.status │            │     ▼ (Materialized │
-│ Errors      │          └──────────────┘            │       View)        │
-└─────────────┘                 │                    │ sessions_aggregated│
-                                │                    │ (AggregatingMT)    │
-                       ┌────────┴────────┐           │ argMax dedup       │
-                       ▼                 ▼           └────────────────────┘
-               ┌──────────────┐  ┌──────────────┐
-               │billing-meter │  │alert-evaluator│
-               │ (cost calc)  │  │ budget 75/90/ │
-               │              │  │ 100% thresholds│
-               └──────────────┘  └──────┬───────┘
-                                        │ publish
-                                        ▼
-                                   Centrifugo ──▶ React Dashboard
-                                   (SSE/WS)
-```
-
-**Why Kafka Engine over Python workers:**
-- Eliminates an entire infrastructure tier (metrics-writer consumer)
-- ClickHouse acts as a Kafka consumer itself, writing to raw MergeTree tables
-- Materialized Views maintain aggregated state incrementally
-
-**Deduplication via `argMax`:**
-- `AggregatingMergeTree` with `argMaxState` resolves duplicates by keeping the latest value per `(org_id, session_id)` key based on `created_at`
-- No heavy locking or `FINAL` modifier required
-- For billing idempotency, `billing-meter` separately records `event_id` to prevent double charges
-
-### 3.2 Technology Choices and Rationale
+### 3.1 Technology Choices and Rationale
 
 | Component | Choice | Why | Alternatives |
 |---|---|---|---|
 | **OLAP storage** | ClickHouse | Columnar storage, 10-20x compression, sub-second analytical queries, Kafka Engine for direct ingestion, built-in TTL policies | TimescaleDB (row-oriented for time-series, simpler but slower on aggregations), Druid (more complex ops) |
-| **OLTP storage** | PostgreSQL | Transactions, RLS, mature ecosystem, ideal for users/orgs/metadata | MySQL (less powerful types), CockroachDB (overhead for this scale) |
+| **OLTP storage** | PostgreSQL | Transactions, RLS (Row-Level Security), mature ecosystem, ideal for users/orgs/metadata | MySQL (less powerful types), CockroachDB (overhead for this scale) |
 | **Message queue** | Kafka | Durability, replay, multiple consumers (analytics + billing + alerts), Kafka Engine integration with ClickHouse | RabbitMQ (no replay), Pulsar (less mature ecosystem) |
 | **Cache** | Redis | TTL-based cache, JWT denylist (<1ms lookup), Pub/Sub for Centrifugo scaling | Memcached (no persistence, no TTL denylist pattern) |
 | **Real-time gateway** | Centrifugo | Connection management, reconnection, message recovery, horizontal scaling — all out of the box. Backend simply POSTs events | Custom SSE (sse-starlette) — for simple cases, doesn't scale |
@@ -245,18 +175,13 @@ Agent Sandbox                Kafka                     ClickHouse
 | **Frontend charts** | Tremor | 35+ analytics components (KPI cards, charts, dark mode), built on Recharts + Radix UI | Recharts directly (more custom code), Highcharts (license) |
 | **Data table** | TanStack Table | Headless, server-side sorting/filtering, cursor pagination, 100k+ rows | AG Grid (heavier, commercial license) |
 
-### 3.3 Authentication and Authorization
+![Architecture Overview](docs/diagrams/architecture-overview.png)
 
-**JWT Flow:**
+### 3.2 Authentication and Authorization
 
-```
-User → Browser → API Gateway → Auth Service → IdP (GitHub/Google)
-                                    │
-                                    ▼
-                            JWT (access 1h + refresh 7d)
-                            Storage: httpOnly, Secure, SameSite=Strict
-                            Signing: RS256
-```
+**Flow:**
+
+![Auth Flow](docs/diagrams/auth-flow.png)
 
 **Token structure:**
 
@@ -298,9 +223,26 @@ if await redis.exists(f"jwt:deny:{jti}"):
 | `member` | Full | Own + team | Aggregated | View only | None |
 | `viewer` | Read-only | Summary | None | None | None |
 
+### 3.3 Data Ingestion Pipeline
+
+![Data Ingestion Flow](docs/diagrams/flow-with-tech.png)
+
+Key architectural decision — **ClickHouse Kafka Engine** for direct event consumption without intermediate workers:
+
+
+**Why Kafka Engine over Python workers:**
+- Eliminates an entire infrastructure tier (metrics-writer consumer)
+- ClickHouse acts as a Kafka consumer itself, writing to raw MergeTree tables
+- Materialized Views maintain aggregated state incrementally
+
+**Deduplication via `argMax`:**
+- `AggregatingMergeTree` with `argMaxState` resolves duplicates by keeping the latest value per `(org_id, session_id)` key based on `created_at`
+- No heavy locking or `FINAL` modifier required
+- For billing idempotency, `billing-meter` separately records `event_id` to prevent double charges
+
 ### 3.4 Multi-Tenancy
 
-**ClickHouse** — no RLS, isolation at the application level:
+**ClickHouse** — no RLS (Row-Level Security), isolation at the application level:
 
 1. Every endpoint extracts `org_id` from the verified JWT via `Depends(get_current_org)`
 2. `org_id` is passed as a parameter using `{org_id:String}` syntax (parameterized queries)
@@ -312,20 +254,23 @@ async def get_current_org(token: str = Depends(oauth2_scheme)) -> str:
     return payload["org_id"]  # always from verified token
 ```
 
-**PostgreSQL** — RLS for its own tables (users, orgs, metadata).
+**PostgreSQL** — RLS (Row-Level Security) for its own tables (users, orgs, metadata).
 
-### 3.5 Real-Time Layer (Centrifugo)
+### 3.5 ClickHouse: Schema and Queries
 
-```
-Backend (Kafka consumers)          Centrifugo              React Client
-┌──────────────────────┐  HTTP   ┌──────────────┐  SSE/WS ┌──────────┐
-│ alert-evaluator      │──────▶  │ Channel:     │───────▶ │ Activity │
-│ session status       │ publish │ org:{org_id} │         │ Feed     │
-│ PR merge event       │   API  │              │         │ Alerts   │
-└──────────────────────┘         │ JWT auth     │         │ Status   │
-                                 │ Redis-backed │         └──────────┘
-                                 └──────────────┘
-```
+**Key design decisions:**
+
+- **Kafka Engine** — ClickHouse consumes events directly from the message broker without intermediate workers, eliminating a separate infrastructure tier
+- **Three-stage pipeline**: Kafka Engine table → raw `MergeTree` storage → `AggregatingMergeTree` via Materialized Views for incremental pre-aggregation
+- **Deduplication** — `argMaxState` keeps the latest value per `(org_id, session_id)` key, avoiding heavy locking or `FINAL` modifier
+- **Primary key** — `ORDER BY (org_id, ...)` ensures optimal data skipping for all tenant-scoped queries
+- **Retention (TTL)** — raw events 7 days, aggregated data 1 year
+
+> Full schema definitions, queries, and migration details: [CLICKHOUSE.md](CLICKHOUSE.md)
+
+### 3.6 Real-Time Layer (Centrifugo)
+
+![Real-Time Flow](docs/diagrams/real-time%20flow.png)
 
 **Channels:**
 - `org:{org_id}:feed` — activity feed (sessions, PR merges)
@@ -334,68 +279,66 @@ Backend (Kafka consumers)          Centrifugo              React Client
 
 **Fallback:** for simple SSE endpoints (single session log streaming) — `sse-starlette` directly in FastAPI.
 
-### 3.6 ClickHouse: Schema and Queries
+### 3.7 API Gateway
 
-**Kafka Engine → Raw → Aggregated:**
+The API Gateway is the single entry point for all client traffic. Key responsibilities:
 
-```sql
--- 1. Kafka consumer table
-CREATE TABLE kafka_agent_events (
-    org_id String, session_id String, event_id String,
-    status String, tokens UInt32, cost Float64, created_at DateTime
-) ENGINE = Kafka
-SETTINGS kafka_broker_list = 'broker:9092',
-         kafka_topic_list   = 'agent.events',
-         kafka_group_name   = 'clickhouse_ingestion',
-         kafka_format       = 'JSONEachRow';
+- **TLS termination** and HTTPS enforcement
+- **Rate limiting** — per organization and pricing tier, preventing noisy-neighbor effects
+- **JWT validation** — verifies token signature and checks the denylist before forwarding to backend services
+- **WAF** — OWASP rule set for request filtering (SQL injection, XSS, etc.)
+- **API versioning** — routes `/api/v1/` prefix to the appropriate service version
+- **Load balancing** — distributes requests across stateless service instances with health checks
 
--- 2. Raw storage
-CREATE TABLE sessions_raw (
-    org_id String, session_id String, event_id String,
-    status String, tokens UInt32, cost Float64, created_at DateTime
-) ENGINE = MergeTree()
-ORDER BY (org_id, session_id, created_at);
+> Full configuration, rate limit tiers, and routing rules: [API_GATEWAY.md](API_GATEWAY.md)
 
--- 3. Materialized View: Kafka → Raw
-CREATE MATERIALIZED VIEW mv_kafka_to_raw TO sessions_raw AS
-SELECT * FROM kafka_agent_events;
+### 3.8 Alerting Strategy
 
--- 4. Aggregated state (AggregatingMergeTree)
-CREATE TABLE sessions_aggregated (
-    org_id String, session_id String,
-    latest_status  AggregateFunction(argMax, String, DateTime),
-    total_tokens   AggregateFunction(sum, UInt32),
-    final_cost     AggregateFunction(argMax, Float64, DateTime),
-    last_updated   AggregateFunction(max, DateTime)
-) ENGINE = AggregatingMergeTree()
-ORDER BY (org_id, session_id);
+Two-tier approach to avoid building a custom notification system:
 
--- 5. Materialized View: Raw → Aggregated
-CREATE MATERIALIZED VIEW mv_sessions_aggregated TO sessions_aggregated AS
-SELECT org_id, session_id,
-    argMaxState(status, created_at)  AS latest_status,
-    sumState(tokens)                 AS total_tokens,
-    argMaxState(cost, created_at)    AS final_cost,
-    maxState(created_at)             AS last_updated
-FROM sessions_raw
-GROUP BY org_id, session_id;
-```
+**Business alerts** — custom `alert-evaluator` Kafka consumer:
+- Budget thresholds: 75%, 90%, 100% of spending limit
+- Quota exhaustion: sessions, tokens, concurrent slots
+- Published to Centrifugo → real-time notifications in UI
 
-**Querying aggregated data:**
+**Infrastructure/SRE alerts** — Grafana Alerting + ClickHouse data source:
+- API latency P95 > 500ms
+- Pipeline lag > 60s
+- Error rate spikes (sandbox crashes, rate limits)
+- Routing: Slack, PagerDuty, email via Grafana contact points
 
 ```sql
-SELECT session_id,
-    argMaxMerge(latest_status) AS status,
-    sumMerge(total_tokens)     AS tokens,
-    argMaxMerge(final_cost)    AS cost
-FROM sessions_aggregated
+-- Example: P95 latency alert in Grafana
+SELECT quantile(0.95)(latency_ms) AS p95_latency
+FROM api_requests
 WHERE org_id = {org_id:String}
-GROUP BY session_id
-ORDER BY maxMerge(last_updated) DESC
-LIMIT 50;
+  AND created_at >= now() - INTERVAL 5 MINUTE;
+
+-- Example: Error rate alert
+SELECT countIf(status = 'error') / count() AS error_rate
+FROM sessions_raw
+WHERE org_id = {org_id:String}
+  AND created_at >= now() - INTERVAL 5 MINUTE;
 ```
 
-**Retention (TTL):** raw events 7 days, aggregated data 1 year — via ClickHouse TTL on MergeTree tables.
+### 3.9 Observability
+
+OpenTelemetry distributed tracing — trace per session:
+
+```
+Trace: session_abc123
+├─ Span: auth.validate_token          (2ms)
+├─ Span: session.create               (15ms)
+├─ Span: sandbox.provision            (1200ms)  ← main latency
+│  ├─ Span: container.pull_image      (800ms)
+│  └─ Span: container.start           (400ms)
+├─ Span: agent.execute                (45000ms)
+│  ├─ Span: llm.completion (x12)      (token counts as attributes)
+│  ├─ Span: tool.file_write (x8)
+│  └─ Span: tool.git_commit (x2)
+├─ Span: pr.create                    (3000ms)
+└─ Span: session.cleanup              (500ms)
+```
 
 ---
 
@@ -447,54 +390,6 @@ At 5,000 organizations / 250,000 users:
 | **Redis** | Standalone | Cluster (3 masters) | Sharding denylist and cache |
 | **Centrifugo** | 1-2 nodes | 3-5 nodes | Redis-backed scaling already built into the architecture |
 
-### 4.4 Alerting Strategy
-
-Two-tier approach to avoid building a custom notification system:
-
-**Business alerts** — custom `alert-evaluator` Kafka consumer:
-- Budget thresholds: 75%, 90%, 100% of spending limit
-- Quota exhaustion: sessions, tokens, concurrent slots
-- Published to Centrifugo → real-time notifications in UI
-
-**Infrastructure/SRE alerts** — Grafana Alerting + ClickHouse data source:
-- API latency P95 > 500ms
-- Pipeline lag > 60s
-- Error rate spikes (sandbox crashes, rate limits)
-- Routing: Slack, PagerDuty, email via Grafana contact points
-
-```sql
--- Example: P95 latency alert in Grafana
-SELECT quantile(0.95)(latency_ms) AS p95_latency
-FROM api_requests
-WHERE org_id = {org_id:String}
-  AND created_at >= now() - INTERVAL 5 MINUTE;
-
--- Example: Error rate alert
-SELECT countIf(status = 'error') / count() AS error_rate
-FROM sessions_raw
-WHERE org_id = {org_id:String}
-  AND created_at >= now() - INTERVAL 5 MINUTE;
-```
-
-### 4.5 Observability
-
-OpenTelemetry distributed tracing — trace per session:
-
-```
-Trace: session_abc123
-├─ Span: auth.validate_token          (2ms)
-├─ Span: session.create               (15ms)
-├─ Span: sandbox.provision            (1200ms)  ← main latency
-│  ├─ Span: container.pull_image      (800ms)
-│  └─ Span: container.start           (400ms)
-├─ Span: agent.execute                (45000ms)
-│  ├─ Span: llm.completion (x12)      (token counts as attributes)
-│  ├─ Span: tool.file_write (x8)
-│  └─ Span: tool.git_commit (x2)
-├─ Span: pr.create                    (3000ms)
-└─ Span: session.cleanup              (500ms)
-```
-
 ---
 
 ## Step 5: Summary
@@ -503,7 +398,7 @@ Trace: session_abc123
 
 | Requirement | How It's Covered |
 |---|---|
-| Multi-tenant dashboard | `org_id` in JWT → parameterized queries (ClickHouse), RLS (PostgreSQL) |
+| Multi-tenant dashboard | `org_id` in JWT → parameterized queries (ClickHouse), RLS (Row-Level Security) (PostgreSQL) |
 | Real-time updates | Centrifugo (SSE/WebSocket) with JWT auth and Redis scaling |
 | Sub-500ms API latency | ClickHouse pre-aggregated views + Redis cache |
 | < 60s data freshness | Kafka → ClickHouse Kafka Engine (direct ingestion, no workers) |
@@ -516,7 +411,7 @@ Trace: session_abc123
 
 | Decision | Pros | Cons |
 |---|---|---|
-| **ClickHouse over TimescaleDB** | 10-20x compression, Kafka Engine, sub-second aggregations | No RLS (app-level isolation), eventual consistency during merges |
+| **ClickHouse over TimescaleDB** | 10-20x compression, Kafka Engine, sub-second aggregations | No RLS (Row-Level Security) — app-level isolation, eventual consistency during merges |
 | **Centrifugo over custom SSE** | Production-ready scaling, reconnection, recovery | Additional service in the infrastructure |
 | **Kafka Engine over Python workers** | Eliminates a separate infrastructure tier | Less control over transformation logic |
 | **JWT + Redis denylist over sessions** | Stateless scaling, <1ms revocation check | Additional Redis dependency for security-critical path |
