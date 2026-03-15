@@ -1,7 +1,10 @@
 """FastAPI application entry point."""
 
+from pathlib import Path
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.analytics.router import router as analytics_router
 from app.auth.router import router as auth_router
@@ -40,3 +43,11 @@ api_router.include_router(team_router)
 api_router.include_router(repositories_router)
 
 app.include_router(api_router)
+
+# Serve frontend static files in production (when built into ./static)
+_static_dir = Path(__file__).resolve().parent.parent / "static"
+if _static_dir.is_dir():
+    app.mount(
+        "/", StaticFiles(directory=str(_static_dir), html=True),
+        name="static",
+    )
