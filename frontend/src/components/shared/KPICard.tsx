@@ -17,10 +17,10 @@ function KPICard({ title, value, delta, deltaType, trendData }: KPICardProps) {
       <Flex alignItems="start">
         <div className="flex-1 min-w-0">
           <Text className="text-neutral-400">{title}</Text>
-          <Flex justifyContent="start" alignItems="baseline" className="space-x-3 truncate">
+          <Flex justifyContent="start" alignItems="center" className="space-x-3">
             <Metric className="text-white font-mono">{value}</Metric>
             {delta && deltaType && (
-              <BadgeDelta deltaType={deltaType} size="xs">
+              <BadgeDelta deltaType={deltaType} size="xs" className="shrink-0 whitespace-nowrap">
                 {delta}
               </BadgeDelta>
             )}

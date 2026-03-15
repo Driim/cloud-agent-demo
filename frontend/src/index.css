@@ -130,6 +130,15 @@ svg text.recharts-text[text-anchor="middle"] {
   fill: #ffffff !important;
 }
 
+/* --- Tremor BadgeDelta icon sizing fix for Tailwind v4 --- */
+/* Tailwind v4 preflight no longer constrains SVG sizing the way v3 did,
+   so Tremor's BadgeDelta arrow icons can blow up. Pin them to 1rem. */
+[class*="tremor-BadgeDelta"] svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
 /* --- Tremor Badge / BadgeDelta dark-mode text contrast --- */
 /* Force white bold text for readability on dark backgrounds. */
 .dark [class*="tremor-Badge"],

@@ -15,7 +15,7 @@ export class ApiError extends Error {
 // Token storage — call setAuthToken() from your auth context after login.
 // In development the mock token lets the app run without a real auth flow.
 // In production this starts empty; setAuthToken() must be called after login.
-let _authToken = import.meta.env.DEV ? 'mock-access-token' : ''
+let _authToken = import.meta.env.VITE_AUTH_TOKEN || (import.meta.env.DEV ? 'mock-access-token' : '')
 
 export function setAuthToken(token: string): void {
   _authToken = token

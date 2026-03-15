@@ -4,6 +4,8 @@ WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend/ ./
+ARG VITE_AUTH_TOKEN=mock-access-token
+ENV VITE_AUTH_TOKEN=$VITE_AUTH_TOKEN
 RUN npm run build
 
 # ---- Backend ----
@@ -15,7 +17,7 @@ RUN pip install --no-cache-dir poetry \
 WORKDIR /app
 
 COPY backend/pyproject.toml backend/poetry.lock ./
-RUN poetry install --only main --no-interaction --no-ansi
+RUN poetry install --only main --no-root --no-interaction --no-ansi
 
 COPY backend/app ./app
 

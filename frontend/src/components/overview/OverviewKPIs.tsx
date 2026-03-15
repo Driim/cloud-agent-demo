@@ -22,7 +22,7 @@ function OverviewKPIs({ data, sessionsTrend }: OverviewKPIsProps) {
       <KPICard
         title="PRs Merged"
         value={data.total_prs_merged.toString()}
-        delta={`${(data.success_rate * 100).toFixed(0)}% success`}
+        delta={`${data.success_rate.toFixed(0)}% success`}
         deltaType="moderateIncrease"
       />
       <KPICard
