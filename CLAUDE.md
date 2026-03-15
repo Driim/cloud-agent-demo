@@ -38,6 +38,13 @@ npm run test:e2e             # playwright E2E tests
 npm run test:e2e:ui          # playwright with UI mode
 ```
 
+### Docker
+
+```bash
+docker build -t agents-dashboard .        # multi-stage build (frontend + backend)
+docker run -p 8000:8000 agents-dashboard  # serves everything on :8000
+```
+
 ## Architecture
 
 ### Backend (`backend/`)
@@ -47,7 +54,7 @@ FastAPI app with modular domain structure. Each module has `router.py`, `service
 - **Entry**: `app/main.py` — mounts routers, CORS middleware
 - **Config**: `app/config.py` — pydantic-settings, env-based
 - **Auth**: `app/auth/` — mock bearer token auth via `dependencies.py` (`get_current_user`)
-- **Modules**: `sessions/`, `analytics/`, `team/`, `repositories/` — each self-contained (`repositories/` has no `mock_data.py` — data is hardcoded in `service.py`)
+- **Modules**: `sessions/`, `analytics/`, `team/`, `repositories/` — each self-contained
 - **All routes** prefixed `/api/v1`
 - **Tests**: `tests/` — pytest-asyncio, AsyncClient fixture in `conftest.py`
 
@@ -71,7 +78,7 @@ React 18 + Vite + TypeScript (strict mode).
 
 - **Unit/integration**: Vitest + Testing Library, config in `vitest.config.ts`, setup in `src/test/setup.ts`
 - **E2E**: Playwright, config in `playwright.config.ts`, specs in `tests/e2e/`, Page Object pattern
-- **Coverage**: `frontend/coverage/` (gitignored in prod, currently committed — consider adding to .gitignore)
+- **Coverage**: `frontend/coverage/` (gitignored)
 
 ### API Endpoints
 
@@ -82,10 +89,12 @@ React 18 + Vite + TypeScript (strict mode).
 | Analytics | `GET /analytics/overview`, `/timeseries/{metric}`, `/quotas`, `/costs`, `/errors` |
 | Team | `GET /analytics/team`, `GET /analytics/team/feed` (SSE) |
 | Repos | `GET /analytics/repositories` |
+| Health | `GET /health` (no auth required) |
 
 ### Connectivity
 
 Frontend Vite dev server proxies `/api` requests to backend at `localhost:8000`. No shared code between frontend and backend.
+In production (Docker), frontend is built into `./static/` and served by FastAPI via `StaticFiles` mount at `/` with `html=True` for SPA routing.
 
 ## UI / Theming
 
@@ -141,4 +150,5 @@ Use regex for text with embedded numbers: `getByText(/members active/)` + separa
 ## Current Status
 
 - No database integration yet (design docs in `clickhouse.md`, `system_design.md`)
-- No Docker or CI/CD configuration
+- Docker deployment configured (`Dockerfile` — multi-stage: Node 20 build + Python 3.11 runtime)
+- No CI/CD configuration yet
