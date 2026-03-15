@@ -50,7 +50,7 @@ Demo is available on [https://demo.cloud_affects.com](https://demo.cloud_affects
 
 ```bash
 cd backend
-poetry install
+poetry install --no-root
 poetry run uvicorn app.main:app --reload
 ```
 
