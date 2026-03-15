@@ -2,7 +2,7 @@
 
 Full-stack monitoring dashboard for AI coding agents. Tracks sessions, costs, team activity, and repository statistics.
 
-Built with **FastAPI** (backend) and **React + Vite** (frontend). Currently runs on mock data — database integration is planned.
+Built with **FastAPI** (backend) and **React + Vite** (frontend). Currently runs on mock data.
 
 ## Check demo
 
