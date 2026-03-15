@@ -1,7 +1,5 @@
 # AgentCloud Dashboard: Benchmark Reference for Mock Data Generation
 
-> March 2026 · Confidential
-
 ---
 
 ## Table of Contents

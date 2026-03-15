@@ -1,71 +1,71 @@
 # AgentCloud: Organization Analytics Dashboard — System Design Interview
 
-> **Задача:** Спроектировать customer-facing аналитический дашборд для платформы, на которой инженерные команды запускают AI coding-агентов в облаке. Агенты выполняют задачи (баг-фиксы, рефакторинг, скаффолдинг) в изолированных sandbox-ах и генерируют Pull Request-ы. Дашборд — это control plane для менеджеров и платформенных команд: мониторинг сессий, расходов, продуктивности команды и состояния системы.
+> **Task:** Design a customer-facing analytics dashboard for a platform where engineering teams run AI coding agents in the cloud. Agents perform tasks (bug fixes, refactoring, scaffolding) in isolated sandboxes and generate Pull Requests. The dashboard serves as the control plane for managers and platform teams: monitoring sessions, costs, team productivity, and system health.
 
 ---
 
-## Шаг 1: Понимание задачи и сбор требований
+## Step 1: Understanding the Problem and Gathering Requirements
 
-### 1.1 Уточняющие вопросы
+### 1.1 Clarifying Questions
 
-| Вопрос | Ответ / Допущение |
+| Question | Answer / Assumption |
 |---|---|
-| Кто основные пользователи дашборда? | Engineering managers, platform teams, отдельные разработчики |
-| Нужна ли multi-tenancy? | Да — дашборд обслуживает несколько организаций, данные строго изолированы |
-| Должен ли дашборд отображать данные в реальном времени? | Частично: activity feed и статусы сессий — real-time (SSE/WebSocket), аналитика — near real-time (задержка < 60 секунд) |
-| Нужна ли ролевая модель доступа? | Да — `org_admin`, `member`, `viewer` с разной гранулярностью доступа к данным |
-| Какие ключевые метрики? | Сессии, токены, расходы (USD), PR-ы, ошибки, квоты, активность команды |
-| Интеграция с внешними IdP? | Да — GitHub и Google OAuth2/OIDC |
+| Who are the primary dashboard users? | Engineering managers, platform teams, individual developers |
+| Is multi-tenancy required? | Yes — the dashboard serves multiple organizations with strictly isolated data |
+| Should the dashboard display real-time data? | Partially: activity feed and session statuses are real-time (SSE/WebSocket), analytics are near real-time (latency < 60 seconds) |
+| Is a role-based access model needed? | Yes — `org_admin`, `member`, `viewer` with different data access granularity |
+| What are the key metrics? | Sessions, tokens, costs (USD), PRs, errors, quotas, team activity |
+| Integration with external IdPs? | Yes — GitHub and Google OAuth2/OIDC |
 
-### 1.2 Функциональные требования
+### 1.2 Functional Requirements
 
-- **Overview-дашборд**: KPI-карточки (сессии, расходы, PR-ы), графики трендов (токены, outcomes), топ репозиториев
-- **Usage & Costs**: тренд расходов, breakdown по категориям (input/output tokens, compute, storage), cost per session, квоты с прогресс-барами, бюджетные алерты (75/90/100%)
-- **Agent Sessions**: таблица сессий с фильтрами (статус, репозиторий, пользователь) и cursor-пагинацией, детальная страница сессии с timeline
-- **Team Activity**: активность по участникам, leaderboard, live activity feed (SSE), adoption rate
-- **Аутентификация**: OAuth2/OIDC (GitHub, Google), JWT (access + refresh), мгновенная инвалидация через denylist
-- **RBAC**: три роли с разным уровнем доступа к данным
+- **Overview dashboard**: KPI cards (sessions, costs, PRs), trend charts (tokens, outcomes), top repositories
+- **Usage & Costs**: spending trend, breakdown by category (input/output tokens, compute, storage), cost per session, quotas with progress bars, budget alerts (75/90/100%)
+- **Agent Sessions**: session table with filters (status, repository, user) and cursor pagination, detailed session page with timeline
+- **Team Activity**: per-member activity, leaderboard, live activity feed (SSE), adoption rate
+- **Authentication**: OAuth2/OIDC (GitHub, Google), JWT (access + refresh), instant invalidation via denylist
+- **RBAC**: three roles with different data access levels
 
-### 1.3 Нефункциональные требования
+### 1.3 Non-Functional Requirements
 
-| Требование | Целевое значение |
+| Requirement | Target Value |
 |---|---|
-| **Availability** | 99.9% (допустимо ~8.7 часов downtime/год) |
-| **Latency** (API P95) | < 500 мс |
-| **Data freshness** (event → dashboard) | < 60 секунд |
-| **Auth token validation** | < 50 мс |
+| **Availability** | 99.9% (acceptable ~8.7 hours downtime/year) |
+| **Latency** (API P95) | < 500 ms |
+| **Data freshness** (event → dashboard) | < 60 seconds |
+| **Auth token validation** | < 50 ms |
 | **Session start success rate** | > 99.5% |
 
-### 1.4 Оценка нагрузки (Back-of-the-Envelope)
+### 1.4 Load Estimation (Back-of-the-Envelope)
 
-**Допущения:**
-- 500 организаций, ~50 разработчиков в среднем на организацию = **25 000 пользователей**
-- Каждый разработчик запускает ~5 agent-сессий в день
-- Каждая сессия генерирует ~12 LLM-вызовов, ~10 tool-вызовов, 1 PR
+**Assumptions:**
+- 500 organizations, ~50 developers per organization on average = **25,000 users**
+- Each developer launches ~5 agent sessions per day
+- Each session generates ~12 LLM calls, ~10 tool calls, 1 PR
 
-**Расчёты:**
+**Calculations:**
 
-| Метрика | Значение |
+| Metric | Value |
 |---|---|
-| Сессий в день | 25 000 × 5 = **125 000** |
-| Событий в день | 125 000 × ~25 событий/сессия = **~3.1 млн** |
-| RPS (events) | 3 100 000 / 86 400 ≈ **~36 RPS** (пик ×3 = ~108 RPS) |
+| Sessions per day | 25,000 × 5 = **125,000** |
+| Events per day | 125,000 × ~25 events/session = **~3.1M** |
+| RPS (events) | 3,100,000 / 86,400 ≈ **~36 RPS** (peak ×3 = ~108 RPS) |
 | RPS (dashboard API) | ~500 concurrent users × 1 req/10s = **~50 RPS** |
-| Хранилище (raw events, 1 год) | 3.1M × 365 × ~500 bytes ≈ **~565 ГБ** |
-| Хранилище (aggregated, 1 год) | ~125K sessions/day × 365 × ~200 bytes ≈ **~9 ГБ** |
+| Storage (raw events, 1 year) | 3.1M × 365 × ~500 bytes ≈ **~565 GB** |
+| Storage (aggregated, 1 year) | ~125K sessions/day × 365 × ~200 bytes ≈ **~9 GB** |
 
-> Нагрузка умеренная — не требует экстремального шардирования на старте, но архитектура должна предусматривать горизонтальное масштабирование.
+> The load is moderate — no extreme sharding required at launch, but the architecture should accommodate horizontal scaling.
 
 ---
 
-## Шаг 2: Высокоуровневый дизайн
-### 2.1 Базовая архитектура
+## Step 2: High-Level Design
+### 2.1 Core Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                            CLIENT LAYER                                 │
 │  React SPA · Tremor (charts/KPI) · TanStack Table · Tailwind CSS       │
-│  Auth tokens в httpOnly cookies · TanStack Query (client-side cache)    │
+│  Auth tokens in httpOnly cookies · TanStack Query (client-side cache)   │
 └──────────────────────────────┬──────────────────────────────────────────┘
                                │ HTTPS (TLS 1.3)
                                ▼
@@ -108,40 +108,40 @@
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Дизайн API
+### 2.2 API Design
 
-Все эндпоинты требуют `Authorization: Bearer <jwt>`, данные скоупятся по `org_id` из токена.
+All endpoints require `Authorization: Bearer <jwt>`, data is scoped by `org_id` from the token.
 
 ```
-Аутентификация:
+Authentication:
   POST   /api/v1/auth/token          OAuth2 password flow → JWT
-  POST   /api/v1/auth/refresh         Ротация refresh-токена
-  GET    /api/v1/auth/me              Профиль текущего пользователя + org
+  POST   /api/v1/auth/refresh         Refresh token rotation
+  GET    /api/v1/auth/me              Current user profile + org
 
-Аналитика:
-  GET    /api/v1/analytics/overview   Сводка KPI организации
+Analytics:
+  GET    /api/v1/analytics/overview   Organization KPI summary
   GET    /api/v1/analytics/timeseries/{metric}
          ?range=7d|30d|90d&granularity=hour|day
-  GET    /api/v1/analytics/quotas     Прогресс квот vs лимиты плана
-  GET    /api/v1/analytics/costs      Breakdown расходов
-  GET    /api/v1/analytics/errors     Распределение ошибок
+  GET    /api/v1/analytics/quotas     Quota progress vs plan limits
+  GET    /api/v1/analytics/costs      Cost breakdown
+  GET    /api/v1/analytics/errors     Error distribution
 
-Сессии:
-  GET    /api/v1/sessions             Cursor-пагинация + фильтры
+Sessions:
+  GET    /api/v1/sessions             Cursor pagination + filters
          ?status=completed|failed&repo=&user=&cursor=&limit=50
-  GET    /api/v1/sessions/{id}        Детали сессии с timeline
+  GET    /api/v1/sessions/{id}        Session details with timeline
 
-Команда:
-  GET    /api/v1/analytics/team       Статистика по участникам
+Team:
+  GET    /api/v1/analytics/team       Per-member statistics
   GET    /api/v1/analytics/team/feed  SSE — live activity feed
 
-Репозитории:
-  GET    /api/v1/analytics/repositories  Статистика по репозиториям
+Repositories:
+  GET    /api/v1/analytics/repositories  Per-repository statistics
 ```
 
-### 2.3 Модель данных
+### 2.3 Data Model
 
-**PostgreSQL** — транзакционные данные:
+**PostgreSQL** — transactional data:
 
 ```
 ┌─────────────┐       ┌──────────────┐       ┌──────────────┐
@@ -156,7 +156,7 @@
                   └───────────────────────┘
 ```
 
-**ClickHouse** — аналитика и time-series:
+**ClickHouse** — analytics and time-series:
 
 ```
 ┌──────────────────┐      MV       ┌────────────────────────┐
@@ -175,9 +175,9 @@
 └──────────────────┘
 ```
 
-### 2.4 Формат ответа API (пагинация)
+### 2.4 API Response Format (Pagination)
 
-Cursor-based пагинация — стабильна при concurrent writes:
+Cursor-based pagination — stable under concurrent writes:
 
 ```json
 {
@@ -194,11 +194,11 @@ Cursor-based пагинация — стабильна при concurrent writes:
 
 ---
 
-## Шаг 3: Глубокое погружение
+## Step 3: Deep Dive
 
 ### 3.1 Data Ingestion Pipeline
 
-Ключевое архитектурное решение — **ClickHouse Kafka Engine** для прямого потребления событий без промежуточных worker-ов:
+Key architectural decision — **ClickHouse Kafka Engine** for direct event consumption without intermediate workers:
 
 ```
 Agent Sandbox                Kafka                     ClickHouse
@@ -222,30 +222,30 @@ Agent Sandbox                Kafka                     ClickHouse
                                    (SSE/WS)
 ```
 
-**Почему Kafka Engine, а не Python workers:**
-- Устраняется целый tier инфраструктуры (metrics-writer consumer)
-- ClickHouse сам выступает Kafka-consumer, пишет в raw MergeTree-таблицы
-- Materialized Views поддерживают агрегированное состояние инкрементально
+**Why Kafka Engine over Python workers:**
+- Eliminates an entire infrastructure tier (metrics-writer consumer)
+- ClickHouse acts as a Kafka consumer itself, writing to raw MergeTree tables
+- Materialized Views maintain aggregated state incrementally
 
-**Деduplication через `argMax`:**
-- `AggregatingMergeTree` с `argMaxState` разрешает дубликаты, сохраняя последнее значение по `(org_id, session_id)` ключу на основе `created_at`
-- Нет тяжёлого locking или модификатора `FINAL`
-- Для billing-идемпотентности `billing-meter` отдельно записывает `event_id` для предотвращения двойных начислений
+**Deduplication via `argMax`:**
+- `AggregatingMergeTree` with `argMaxState` resolves duplicates by keeping the latest value per `(org_id, session_id)` key based on `created_at`
+- No heavy locking or `FINAL` modifier required
+- For billing idempotency, `billing-meter` separately records `event_id` to prevent double charges
 
-### 3.2 Выбор технологий и обоснование
+### 3.2 Technology Choices and Rationale
 
-| Компонент | Выбор | Почему | Альтернативы |
+| Component | Choice | Why | Alternatives |
 |---|---|---|---|
-| **OLAP-хранилище** | ClickHouse | Колоночное хранение, сжатие 10-20x, sub-second аналитические запросы, Kafka Engine для direct ingestion, TTL-политики из коробки | TimescaleDB (row-oriented для time-series, проще но медленнее на aggregations), Druid (сложнее в ops) |
-| **OLTP-хранилище** | PostgreSQL | Транзакции, RLS, зрелая экосистема, идеальна для users/orgs/metadata | MySQL (менее мощные types), CockroachDB (overhead для данного масштаба) |
-| **Очередь** | Kafka | Durability, replay, multiple consumers (analytics + billing + alerts), Kafka Engine integration с ClickHouse | RabbitMQ (нет replay), Pulsar (менее зрелая экосистема) |
-| **Кэш** | Redis | TTL-based cache, JWT denylist (<1ms lookup), Pub/Sub для Centrifugo scaling | Memcached (нет persistence, нет TTL denylist pattern) |
-| **Real-time gateway** | Centrifugo | Connection management, reconnection, message recovery, horizontal scaling — всё из коробки. Backend просто POST-ит события | Custom SSE (sse-starlette) — для простых кейсов, не масштабируется |
-| **Auth** | fastapi-users + fastapi-sso | Экономит ~500 строк boilerplate: JWT, refresh rotation, password reset, OAuth2 | SuperTokens, Keycloak — полноценные IdP, но operational overhead |
-| **Frontend charts** | Tremor | 35+ компонентов для аналитики (KPI cards, charts, dark mode), built on Recharts + Radix UI | Recharts напрямую (больше custom кода), Highcharts (лицензия) |
-| **Data table** | TanStack Table | Headless, server-side sorting/filtering, cursor pagination, 100k+ строк | AG Grid (тяжелее, коммерческая лицензия) |
+| **OLAP storage** | ClickHouse | Columnar storage, 10-20x compression, sub-second analytical queries, Kafka Engine for direct ingestion, built-in TTL policies | TimescaleDB (row-oriented for time-series, simpler but slower on aggregations), Druid (more complex ops) |
+| **OLTP storage** | PostgreSQL | Transactions, RLS, mature ecosystem, ideal for users/orgs/metadata | MySQL (less powerful types), CockroachDB (overhead for this scale) |
+| **Message queue** | Kafka | Durability, replay, multiple consumers (analytics + billing + alerts), Kafka Engine integration with ClickHouse | RabbitMQ (no replay), Pulsar (less mature ecosystem) |
+| **Cache** | Redis | TTL-based cache, JWT denylist (<1ms lookup), Pub/Sub for Centrifugo scaling | Memcached (no persistence, no TTL denylist pattern) |
+| **Real-time gateway** | Centrifugo | Connection management, reconnection, message recovery, horizontal scaling — all out of the box. Backend simply POSTs events | Custom SSE (sse-starlette) — for simple cases, doesn't scale |
+| **Auth** | fastapi-users + fastapi-sso | Saves ~500 lines of boilerplate: JWT, refresh rotation, password reset, OAuth2 | SuperTokens, Keycloak — full-fledged IdPs, but more operational overhead |
+| **Frontend charts** | Tremor | 35+ analytics components (KPI cards, charts, dark mode), built on Recharts + Radix UI | Recharts directly (more custom code), Highcharts (license) |
+| **Data table** | TanStack Table | Headless, server-side sorting/filtering, cursor pagination, 100k+ rows | AG Grid (heavier, commercial license) |
 
-### 3.3 Аутентификация и авторизация
+### 3.3 Authentication and Authorization
 
 **JWT Flow:**
 
@@ -254,11 +254,11 @@ User → Browser → API Gateway → Auth Service → IdP (GitHub/Google)
                                     │
                                     ▼
                             JWT (access 1h + refresh 7d)
-                            Хранение: httpOnly, Secure, SameSite=Strict
-                            Подпись: RS256
+                            Storage: httpOnly, Secure, SameSite=Strict
+                            Signing: RS256
 ```
 
-**Структура токена:**
+**Token structure:**
 
 ```json
 {
@@ -274,25 +274,25 @@ User → Browser → API Gateway → Auth Service → IdP (GitHub/Google)
 
 **Instant Session Invalidation (JWT Denylist):**
 
-Проблема: после revoke токен действует до истечения TTL (до 1 часа).
-Решение: Redis-based denylist по `jti`:
+Problem: after revocation, the token remains valid until TTL expiry (up to 1 hour).
+Solution: Redis-based denylist by `jti`:
 
 ```python
 # Revocation
 await redis.setex(f"jwt:deny:{jti}", ttl=remaining_seconds, value="revoked")
 
-# Middleware check (каждый запрос)
+# Middleware check (every request)
 if await redis.exists(f"jwt:deny:{jti}"):
     raise HTTPException(status_code=401, detail="Token revoked")
 ```
 
-- Happy path: stateless JWT, без обращения к Redis
+- Happy path: stateless JWT, no Redis call
 - Redis check: <1ms latency per request
-- TTL автоматически чистит denylist
+- TTL automatically cleans up the denylist
 
 **RBAC:**
 
-| Роль | Dashboard | Session Details | Cost Data | Team Activity | Admin |
+| Role | Dashboard | Session Details | Cost Data | Team Activity | Admin |
 |---|---|---|---|---|---|
 | `org_admin` | Full | Full | Full | Full | Full |
 | `member` | Full | Own + team | Aggregated | View only | None |
@@ -300,19 +300,19 @@ if await redis.exists(f"jwt:deny:{jti}"):
 
 ### 3.4 Multi-Tenancy
 
-**ClickHouse** — без RLS, изоляция на уровне приложения:
+**ClickHouse** — no RLS, isolation at the application level:
 
-1. Каждый endpoint извлекает `org_id` из верифицированного JWT через `Depends(get_current_org)`
-2. `org_id` передаётся как параметр через `{org_id:String}` синтаксис (parameterized queries)
-3. String concatenation для `org_id` строго запрещена
+1. Every endpoint extracts `org_id` from the verified JWT via `Depends(get_current_org)`
+2. `org_id` is passed as a parameter using `{org_id:String}` syntax (parameterized queries)
+3. String concatenation for `org_id` is strictly prohibited
 
 ```python
 async def get_current_org(token: str = Depends(oauth2_scheme)) -> str:
     payload = verify_jwt(token)
-    return payload["org_id"]  # всегда из верифицированного токена
+    return payload["org_id"]  # always from verified token
 ```
 
-**PostgreSQL** — RLS для своих таблиц (users, orgs, metadata).
+**PostgreSQL** — RLS for its own tables (users, orgs, metadata).
 
 ### 3.5 Real-Time Layer (Centrifugo)
 
@@ -327,14 +327,14 @@ Backend (Kafka consumers)          Centrifugo              React Client
                                  └──────────────┘
 ```
 
-**Каналы:**
-- `org:{org_id}:feed` — activity feed (сессии, PR merges)
-- `org:{org_id}:alerts` — бюджетные предупреждения, спайки ошибок
-- `org:{org_id}:sessions` — live статусы сессий
+**Channels:**
+- `org:{org_id}:feed` — activity feed (sessions, PR merges)
+- `org:{org_id}:alerts` — budget warnings, error spikes
+- `org:{org_id}:sessions` — live session statuses
 
-**Fallback:** для простых SSE-эндпоинтов (стриминг логов одной сессии) — `sse-starlette` напрямую в FastAPI.
+**Fallback:** for simple SSE endpoints (single session log streaming) — `sse-starlette` directly in FastAPI.
 
-### 3.6 ClickHouse: схема и запросы
+### 3.6 ClickHouse: Schema and Queries
 
 **Kafka Engine → Raw → Aggregated:**
 
@@ -381,7 +381,7 @@ FROM sessions_raw
 GROUP BY org_id, session_id;
 ```
 
-**Запрос агрегированных данных:**
+**Querying aggregated data:**
 
 ```sql
 SELECT session_id,
@@ -395,81 +395,81 @@ ORDER BY maxMerge(last_updated) DESC
 LIMIT 50;
 ```
 
-**Retention (TTL):** raw events 7 дней, aggregated data 1 год — через ClickHouse TTL на MergeTree-таблицах.
+**Retention (TTL):** raw events 7 days, aggregated data 1 year — via ClickHouse TTL on MergeTree tables.
 
 ---
 
-## Шаг 4: Выявление узких мест и масштабирование
+## Step 4: Identifying Bottlenecks and Scaling
 
-### 4.1 Точки отказа (SPOF) и mitigation
+### 4.1 Single Points of Failure (SPOF) and Mitigation
 
-| Компонент | Риск | Митигация |
+| Component | Risk | Mitigation |
 |---|---|---|
 | **API Gateway** | Single point of entry | Multi-AZ deployment, health checks, auto-scaling group |
-| **ClickHouse** | Единственный OLAP-узел | ClickHouse Keeper + ReplicatedMergeTree, read replicas для dashboard queries |
-| **Kafka** | Потеря событий | Replication factor ≥ 3, `acks=all` от producers, ISR (In-Sync Replicas) |
-| **Redis** | Потеря JWT denylist | Redis Sentinel или Cluster mode; при полной потере — токены живут до expiry (max 1 час, acceptable) |
-| **Centrifugo** | Обрыв real-time feeds | Redis-backed Pub/Sub для horizontal scaling, auto-reconnection на клиенте, message recovery |
-| **PostgreSQL** | Потеря транзакционных данных | Streaming replication, automated failover (Patroni), point-in-time recovery |
+| **ClickHouse** | Single OLAP node | ClickHouse Keeper + ReplicatedMergeTree, read replicas for dashboard queries |
+| **Kafka** | Event loss | Replication factor ≥ 3, `acks=all` from producers, ISR (In-Sync Replicas) |
+| **Redis** | JWT denylist loss | Redis Sentinel or Cluster mode; on total loss — tokens live until expiry (max 1 hour, acceptable) |
+| **Centrifugo** | Real-time feed disruption | Redis-backed Pub/Sub for horizontal scaling, auto-reconnection on client, message recovery |
+| **PostgreSQL** | Transactional data loss | Streaming replication, automated failover (Patroni), point-in-time recovery |
 
-### 4.2 Оптимизация производительности
+### 4.2 Performance Optimization
 
-**Кэширование (Redis):**
-- KPI-карточки overview: TTL 60 секунд (инвалидация по event)
-- Квоты: TTL 30 секунд (чувствительны к актуальности)
-- Список репозиториев: TTL 5 минут (редко меняется)
-- JWT denylist: TTL = оставшееся время жизни токена
+**Caching (Redis):**
+- Overview KPI cards: TTL 60 seconds (event-based invalidation)
+- Quotas: TTL 30 seconds (freshness-sensitive)
+- Repository list: TTL 5 minutes (rarely changes)
+- JWT denylist: TTL = remaining token lifetime
 
-**ClickHouse оптимизации:**
-- `ORDER BY (org_id, ...)` — все запросы начинаются с org_id, что обеспечивает optimal data skipping
-- `AggregatingMergeTree` вместо `GROUP BY` at query time — предвычисленные агрегаты
-- Колоночное сжатие: 10-20x на типичных аналитических данных
-- `count()` по primary key — near-instant благодаря sparse index
+**ClickHouse optimizations:**
+- `ORDER BY (org_id, ...)` — all queries start with org_id, ensuring optimal data skipping
+- `AggregatingMergeTree` instead of `GROUP BY` at query time — pre-computed aggregates
+- Columnar compression: 10-20x on typical analytical data
+- `count()` on primary key — near-instant thanks to sparse index
 
-**CDN и статика:**
-- React SPA bundle, шрифты (Inter, JetBrains Mono) — через CDN
-- API-ответы с KPI не кэшируются на CDN (org-scoped)
+**CDN and static assets:**
+- React SPA bundle, fonts (Inter, JetBrains Mono) — via CDN
+- API responses with KPIs are not cached on CDN (org-scoped)
 
-**Клиентская оптимизация:**
-- TanStack Query: `staleTime: 60s`, `retry: 1` — минимизация redundant requests
-- Cursor-based пагинация: стабильна при concurrent inserts (в отличие от offset)
+**Client-side optimization:**
+- TanStack Query: `staleTime: 60s`, `retry: 1` — minimizes redundant requests
+- Cursor-based pagination: stable under concurrent inserts (unlike offset)
 
-### 4.3 Масштабирование при 10x росте
+### 4.3 Scaling at 10x Growth
 
-При росте до 5 000 организаций / 250 000 пользователей:
+At 5,000 organizations / 250,000 users:
 
-| Слой | Текущий | При 10x | Действия |
+| Layer | Current | At 10x | Actions |
 |---|---|---|---|
-| **API** | 2-3 инстанса | 10-15 инстансов | Horizontal scaling за Load Balancer, stateless сервисы |
-| **ClickHouse** | Single node | Cluster (3+ shards) | Шардирование по `org_id` (consistent hashing), ReplicatedMergeTree |
-| **Kafka** | 3 брокера | 6-9 брокеров | Увеличение partitions per topic, партиционирование по `org_id` |
-| **PostgreSQL** | Single primary + replica | Primary + 2 replicas | Read replicas для auth-тяжёлых запросов; при необходимости — шардирование по org_id |
-| **Redis** | Standalone | Cluster (3 masters) | Шардирование denylist и кэша |
-| **Centrifugo** | 1-2 ноды | 3-5 нод | Redis-backed scaling уже заложен в архитектуру |
+| **API** | 2-3 instances | 10-15 instances | Horizontal scaling behind Load Balancer, stateless services |
+| **ClickHouse** | Single node | Cluster (3+ shards) | Sharding by `org_id` (consistent hashing), ReplicatedMergeTree |
+| **Kafka** | 3 brokers | 6-9 brokers | Increase partitions per topic, partition by `org_id` |
+| **PostgreSQL** | Single primary + replica | Primary + 2 replicas | Read replicas for auth-heavy queries; sharding by org_id if needed |
+| **Redis** | Standalone | Cluster (3 masters) | Sharding denylist and cache |
+| **Centrifugo** | 1-2 nodes | 3-5 nodes | Redis-backed scaling already built into the architecture |
 
 ### 4.4 Alerting Strategy
 
-Двухуровневый подход, чтобы не строить custom notification system:
+Two-tier approach to avoid building a custom notification system:
 
 **Business alerts** — custom `alert-evaluator` Kafka consumer:
-- Budget thresholds: 75%, 90%, 100% лимита расходов
-- Quota exhaustion: сессии, токены, concurrent slots
-- Публикация в Centrifugo → real-time уведомления в UI
+- Budget thresholds: 75%, 90%, 100% of spending limit
+- Quota exhaustion: sessions, tokens, concurrent slots
+- Published to Centrifugo → real-time notifications in UI
 
 **Infrastructure/SRE alerts** — Grafana Alerting + ClickHouse data source:
 - API latency P95 > 500ms
 - Pipeline lag > 60s
 - Error rate spikes (sandbox crashes, rate limits)
-- Routing: Slack, PagerDuty, email через Grafana contact points
+- Routing: Slack, PagerDuty, email via Grafana contact points
 
 ```sql
--- Пример: P95 latency alert в Grafana
+-- Example: P95 latency alert in Grafana
 SELECT quantile(0.95)(latency_ms) AS p95_latency
 FROM api_requests
 WHERE org_id = {org_id:String}
   AND created_at >= now() - INTERVAL 5 MINUTE;
 
--- Пример: Error rate alert
+-- Example: Error rate alert
 SELECT countIf(status = 'error') / count() AS error_rate
 FROM sessions_raw
 WHERE org_id = {org_id:String}
@@ -484,11 +484,11 @@ OpenTelemetry distributed tracing — trace per session:
 Trace: session_abc123
 ├─ Span: auth.validate_token          (2ms)
 ├─ Span: session.create               (15ms)
-├─ Span: sandbox.provision            (1200ms)  ← основная латентность
+├─ Span: sandbox.provision            (1200ms)  ← main latency
 │  ├─ Span: container.pull_image      (800ms)
 │  └─ Span: container.start           (400ms)
 ├─ Span: agent.execute                (45000ms)
-│  ├─ Span: llm.completion (x12)      (token counts как attributes)
+│  ├─ Span: llm.completion (x12)      (token counts as attributes)
 │  ├─ Span: tool.file_write (x8)
 │  └─ Span: tool.git_commit (x2)
 ├─ Span: pr.create                    (3000ms)
@@ -497,36 +497,36 @@ Trace: session_abc123
 
 ---
 
-## Шаг 5: Подведение итогов
+## Step 5: Summary
 
-### 5.1 Покрытие требований
+### 5.1 Requirements Coverage
 
-| Требование | Как покрыто |
+| Requirement | How It's Covered |
 |---|---|
-| Multi-tenant dashboard | `org_id` в JWT → parameterized queries (ClickHouse), RLS (PostgreSQL) |
-| Real-time updates | Centrifugo (SSE/WebSocket) с JWT auth и Redis scaling |
+| Multi-tenant dashboard | `org_id` in JWT → parameterized queries (ClickHouse), RLS (PostgreSQL) |
+| Real-time updates | Centrifugo (SSE/WebSocket) with JWT auth and Redis scaling |
 | Sub-500ms API latency | ClickHouse pre-aggregated views + Redis cache |
 | < 60s data freshness | Kafka → ClickHouse Kafka Engine (direct ingestion, no workers) |
-| RBAC (3 роли) | JWT claims + middleware enforcement |
+| RBAC (3 roles) | JWT claims + middleware enforcement |
 | Secure auth | OAuth2/OIDC, RS256, httpOnly cookies, instant revocation via denylist |
 | Budget alerts | Two-track: custom consumer (business) + Grafana Alerting (infra) |
-| Cursor pagination | Стабильна при concurrent writes, exact count через ClickHouse sparse index |
+| Cursor pagination | Stable under concurrent writes, exact count via ClickHouse sparse index |
 
-### 5.2 Ключевые trade-offs
+### 5.2 Key Trade-offs
 
-| Решение | Плюсы | Минусы |
+| Decision | Pros | Cons |
 |---|---|---|
-| **ClickHouse over TimescaleDB** | 10-20x сжатие, Kafka Engine, sub-second aggregations | Нет RLS (app-level isolation), eventual consistency при мержах |
-| **Centrifugo over custom SSE** | Production-ready scaling, reconnection, recovery | Дополнительный сервис в инфраструктуре |
-| **Kafka Engine over Python workers** | Нет отдельного tier инфраструктуры | Меньше контроля над transformation logic |
-| **JWT + Redis denylist over sessions** | Stateless scaling, <1ms revocation check | Дополнительная зависимость от Redis для security-critical path |
-| **fastapi-users over Keycloak** | Проще деплой, меньше ops overhead | Менее зрелая MFA, audit trail, enterprise features |
+| **ClickHouse over TimescaleDB** | 10-20x compression, Kafka Engine, sub-second aggregations | No RLS (app-level isolation), eventual consistency during merges |
+| **Centrifugo over custom SSE** | Production-ready scaling, reconnection, recovery | Additional service in the infrastructure |
+| **Kafka Engine over Python workers** | Eliminates a separate infrastructure tier | Less control over transformation logic |
+| **JWT + Redis denylist over sessions** | Stateless scaling, <1ms revocation check | Additional Redis dependency for security-critical path |
+| **fastapi-users over Keycloak** | Simpler deployment, less ops overhead | Less mature MFA, audit trail, enterprise features |
 
-### 5.3 Что бы улучшил при большем времени
+### 5.3 Future Improvements Given More Time
 
-- **Аномалии и ML**: автоматическое обнаружение аномальных расходов или паттернов ошибок
-- **Multi-region**: geo-distributed ClickHouse кластер для глобальных команд
-- **Audit log**: immutable log всех admin-действий для compliance
-- **A/B тестирование агентов**: сравнение производительности разных моделей/конфигураций
-- **Self-service quotas**: UI для org_admin-ов для настройки лимитов и алертов без обращения в support
-- **Export и интеграции**: API для экспорта данных в BI-системы (Looker, Metabase), webhooks для внешних алертов
+- **Anomaly detection and ML**: automatic detection of abnormal spending or error patterns
+- **Multi-region**: geo-distributed ClickHouse cluster for global teams
+- **Audit log**: immutable log of all admin actions for compliance
+- **Agent A/B testing**: comparing performance across different models/configurations
+- **Self-service quotas**: UI for org_admins to configure limits and alerts without contacting support
+- **Export and integrations**: API for data export to BI systems (Looker, Metabase), webhooks for external alerts
