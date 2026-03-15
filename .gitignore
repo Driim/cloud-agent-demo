@@ -1,0 +1,7 @@
+frontend/coverage
+frontend/playwright-report
+
+.DS_Store
+.playwright-cli/
+docs/.DS_Store
+backend/.coverage
