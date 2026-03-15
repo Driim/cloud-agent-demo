@@ -33,9 +33,9 @@ Demo is available on [https://demo.cloud_affects.com](https://demo.cloud_affects
 
 | Document | Description |
 |----------|-------------|
-| [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md) | System design for the analytics dashboard — requirements, architecture, data flow, scaling, and trade-offs |
-| [API_GATEWAY.md](API_GATEWAY.md) | API gateway design — TLS termination, JWT validation, rate limiting, routing, and WAF |
-| [CLICKHOUSE.md](CLICKHOUSE.md) | ClickHouse implementation reference — Kafka ingestion, SQL schemas, materialized views, and query patterns |
+| [system_design.md](system_design.md) | System design for the analytics dashboard — requirements, architecture, data flow, scaling, and trade-offs |
+| [api_gateway.md](api_gateway.md) | API gateway design — TLS termination, JWT validation, rate limiting, routing, and WAF |
+| [clickhouse.md](clickhouse.md) | ClickHouse implementation reference — Kafka ingestion, SQL schemas, materialized views, and query patterns |
 | [STATS_BENCHMARK.md](STATS_BENCHMARK.md) | Benchmark reference for mock data generation — realistic KPI ranges, distributions, and sources |
 
 ## Getting Started
