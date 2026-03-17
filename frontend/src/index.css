@@ -77,6 +77,11 @@
   color: #a3a3a3 !important;
 }
 
+/* Legend dot-to-label spacing (Tremor renders its own Legend, not Recharts') */
+[class*="tremor-Legend-legendItem"] svg {
+  margin-right: 0.5rem !important; /* 8px, up from default 6px (mr-1.5) */
+}
+
 /* Tooltip */
 .recharts-tooltip-wrapper .recharts-default-tooltip {
   background-color: #1a1a1a !important;

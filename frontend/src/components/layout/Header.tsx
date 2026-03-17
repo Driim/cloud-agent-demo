@@ -7,7 +7,7 @@ const USER_ROLE = 'Admin'
 
 function Header() {
   return (
-    <header className="fixed top-0 left-60 right-0 h-14 bg-white/5 border-b border-white/10 flex items-center justify-between px-6 z-10">
+    <header className="fixed top-0 left-60 right-0 h-14 bg-neutral-900 border-b border-white/10 flex items-center justify-between px-6 z-10">
       <span className="font-semibold text-white">{ORG_NAME}</span>
       <div className="flex items-center gap-3">
         <span className="text-sm text-neutral-400">{USER_EMAIL}</span>
