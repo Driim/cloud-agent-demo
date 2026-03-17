@@ -6,7 +6,9 @@ Built with **FastAPI** (backend) and **React + Vite** (frontend). Currently runs
 
 ## Check demo
 
-Demo is available on [https://demo.cloudaffects.com](https://demo.cloudaffects.com)
+Demo is available on [https://demo.cloudaffects.com](https://demo.cloudaffects.com) *
+
+\* Desktop only
 
 ## Tech Stack
 
